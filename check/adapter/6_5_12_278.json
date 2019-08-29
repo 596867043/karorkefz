@@ -1,0 +1,94 @@
+{
+	"version": "6.5.12.278",
+	"data": {
+		"adapter": {
+			"version": "ture"
+		},
+		"Setting": {
+			//设置方法参数
+			"j_Class": "com.tencent.karaoke.module.config.ui.j",
+			"j_Method": "t",
+			"B_Field":"r"
+
+		},
+		"Ktv": {
+			//准备参数
+			"h_class": "com.tencent.karaoke.module.ktv.ui.h",
+			"h$26_class": "com.tencent.karaoke.module.ktv.ui.h$26",
+			//语音席
+			"KTVY_Class": "com.tencent.karaoke.module.ktv.ui.h",
+			"KTVY_Method": "Q",
+			//禁止滑动
+			"KTV_cS_Class": "com.tencent.karaoke.module.ktv.ui.l$d",
+			"KTV_cS_Method": "a",
+			//密码破解
+			//准备参数
+			"GetKtvInfoRsp_Class": "proto_room.GetKtvInfoRsp",
+			//准备函数
+			"RoomPasswordDialog_Class": "com.tencent.karaoke.module.ktv.widget.RoomPasswordDialog",
+			"RoomPasswordDialog_View_Method": "a",
+			"inputFieldName": "d",
+			//失败监听
+			"failure_Class": "com.tencent.karaoke.module.ktv.ui.h$17",
+			"failure_Method": "a",
+			//机器人
+			//准备参数
+			"one_Class": "com.tencent.karaoke.module.ktv.a.u",
+			"one_Method": "a",
+			//监听函数
+			"Robot_Class": "com.tencent.karaoke.module.ktv.ui.gift.b",
+			"Robot_Method": "a",
+			//发送
+			"send_object_Class": "com.tencent.karaoke.module.ktv.a.u"
+		},
+		"Live": {
+			//准备参数
+			"i_Class": "com.tencent.karaoke.module.live.common.i",
+			"k_Class": "com.tencent.karaoke.module.live.common.k",
+			"LiveFragment_Class": "com.tencent.karaoke.module.live.ui.LiveFragment",
+			"LiveFragment$11_Class": "com.tencent.karaoke.module.live.ui.LiveFragment$11",
+			"GiftInfo_Class": "com.tencent.karaoke.module.live.common.GiftInfo",
+			"UserInfo_Class": "PROTO_UGC_WEBAPP.UserInfo",
+			"RoomUserInfo_Class": "proto_room.RoomUserInfo",
+			//禁止滑动
+			"LIVE_cS_Class": "com.tencent.karaoke.module.live.ui.LivePageViewPager",
+			"LIVE_cS_Method": "canScroll",
+			//机器人
+			//准备参数
+			"UserInfoCacheData_Class": "com.tencent.karaoke.common.database.entity.user.UserInfoCacheData",
+			"Robot_ready_Class": "com.tencent.karaoke.module.live.business.ag",
+			"Robot_ready_Method": "a",
+			//公屏监测
+			"Robot_Class": "com.tencent.karaoke.module.live.ui.k",
+			"Robot_Method": "a",
+			//礼物监听
+			"Gift_Class": "com.tencent.karaoke.module.giftpanel.animation.widget.GiftUserBar",
+			"Gift_Method": "a",
+			//发送
+			"send_object_Class": "com.tencent.karaoke.module.ktv.a.u"
+		},
+		"User": {
+			//准备参数
+			"h_Class": "com.tencent.karaoke.common.network.h",
+			"i_Class": "com.tencent.karaoke.common.network.i",
+			"WebappGetFollowerListRsp_Class": "proto_relation.WebappGetFollowerListRsp",
+			//绘制界面
+			"View_Class": "com.tencent.karaoke.module.user.ui.h",
+			"View_Method": "onCreateView",
+			"kFieldName": "k",
+			//粉丝列表
+			"Fan_List_Class": "com.tencent.karaoke.module.user.business.bq",
+			"Fan_List_Method": "onReply",
+			"requestType_Method": "getRequestType",
+			"c_Method": "c",
+			"vctUserListFieldName": "vctUserList",
+			//网络监听
+			"JceStruct_Class": "com.qq.taf.jce.JceStruct",
+			"a_Class": "com.tencent.karaoke.base.business.a",
+			"Network_Class": "com.tencent.karaoke.module.user.business.bq",
+			"Network_Method": "onReply",
+			//发送
+			"WebappRmFanReq_Class": "proto_relation.WebappRmFanReq"
+		}
+	}
+}

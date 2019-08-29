@@ -1,0 +1,128 @@
+{
+	"version": "6.8.1.273",
+	"data": {
+		"adapter": {
+			"version": "ture"
+		},
+		"Setting": {
+			//设置方法参数
+			"View_Class": "com.tencent.karaoke.module.config.ui.La",
+			"View_Method": "sb",
+			"View_Field": "pa"
+		},
+		"Notification": {
+			//通知栏
+			"Notification__Class": "com.tencent.karaoke.common.media.w",
+			"Notification_Method": "a",
+			"titleID": "7f091750",
+			"textID": "7f09174e",
+			"bitmapID": "7f09174b",
+			"iconID": "7f080d4e",
+			"PlaySongInfo__Class": "com.tencent.karaoke.common.media.player.PlaySongInfo",
+			"Intent_Class": "com.tencent.karaoke.common.k",
+			"preSongIntent_Field": "e", //_action_play_pre_song
+			"playIntent_Field": "b", //_action_play_pause
+			"nextSongIntent_Field": "f" //_action_play_next_song
+		},
+		"Ktv": {
+			//语音席
+			"KTVY_Class": "com.tencent.karaoke.module.ktv.ui.We",
+			"KTVY_Method": "fc",
+			"KTVY_Field": "Ga",
+			"KTVY_Field_call": "Bb",
+
+			//禁止滑动
+			"KTV_cS_Class": "com.tencent.karaoke.module.ktv.ui.Ff",
+			"KTV_cS_Method": "d",
+
+			//密码破解
+			//准备函数
+			"KTVIN_Function_Class": "com.tencent.karaoke.module.ktv.ui.We",
+			//输入框准备
+			"KTVIN_InputEditText_Class": "com.tencent.karaoke.module.ktv.widget.RoomPasswordDialog",
+			"KTVIN_InputEditText_Method": "initView",
+			"KTVIN_InputEditText_Field": "c",
+			//监听手动确认、取消按钮，关闭密码破解
+			"KTVIN_onClick_Class": "com.tencent.karaoke.module.ktv.widget.RoomPasswordDialog",
+			"KTVIN_onClick_Method": "onClick",
+			//失败监听
+			"KTVIN_failure_Class": "com.tencent.karaoke.module.ktv.ui.xe",
+			"KTVIN_failure_Method": "a",
+			"KTVIN_failure_oneClass": "proto_room.GetKtvInfoRsp",
+			//发送参数
+			"KTVIN_send_Class": "com.tencent.karaoke.module.ktv.ui.He",
+			"KTVIN_send_Method": "a",
+
+			//Robot
+			//准备函数
+			"Robot_Function_Class": "com.tencent.karaoke.g.B.a.H",
+			"Robot_Function_Method": "a",
+			//聊天公屏监听函数
+			"Robot_Listener_Class": "com.tencent.karaoke.module.ktv.ui.gift.p",
+			"Robot_Listener_Method": "a",
+			//发送信息
+			"Robot_send_Class": "com.tencent.karaoke.g.B.a.H",
+			"Robot_send_Method": "a",
+			"KaraokeContext_Class": "com.tencent.karaoke.common.KaraokeContext",
+			"getRoomController_Method": "getRoomController",
+			"getRoomController_data_Method": "p"
+		},
+		"Live": {
+			//禁止滑动
+			"LIVE_cS_Class": "com.tencent.karaoke.module.live.ui.LivePageViewPager",
+			"LIVE_cS_Method": "a",
+
+			//机器人
+			//准备参数
+			"Robot_Function_Class": "com.tencent.karaoke.module.live.a.Ua",
+			"Robot_Function_Method": "a",
+			"UserInfoCacheData_Class": "com.tencent.karaoke.common.database.entity.user.UserInfoCacheData",
+			//聊天公屏监听函数
+			"Robot_Listener_Class": "com.tencent.karaoke.module.live.ui.bc",
+			"Robot_Listener_Method": "b",
+			//发送信息
+			"Robot_send_Class": "com.tencent.karaoke.g.B.a.H",
+			"Robot_send_Method": "a",
+			"LiveFragment_Class": "com.tencent.karaoke.module.live.ui.LiveFragment"
+		},
+		"User": {
+			//添加复选框
+			"CheckBox_View_Class": "com.tencent.karaoke.module.user.ui.ub$d",
+			"CheckBox_View_Method": "a",
+			"CheckBox_View_oneClass": "com.tencent.karaoke.common.database.entity.user.FansInfoCacheData",
+			"CheckBox_View_twoClass": "com.tencent.karaoke.module.user.ui.ub$f",
+			"CheckBox_View_fansUid": "b",
+			"CheckBox_View_Field": "y",
+			//添加删除按钮
+			"Delete_View_Class": "com.tencent.karaoke.module.user.ui.ub",
+			"Delete_View_Method": "onCreateView",
+			"Delete_View_Field": "ha",
+			//发送移除粉丝数据
+			"send_Class": "com.tencent.karaoke.base.business.a",
+			"send_Method": "j",
+			"send_oneClass": "proto_relation.WebappRmFanReq"
+		},
+		"Other": {
+			//礼物列表关闭
+			"Other_Gift_Live_Close_Class":"com.tencent.karaoke.common.scheduler.q",
+			"Other_Gift_Live_Close_Method":"e",
+			"Other_Gift_Live_Close_String":"com.tencent.karaoke.module.roomcommon.lottery.ui.RoomLotteryCreateActivity",
+			"Other_Gift_Ktv_Close_Class":"com.tencent.mtt.hippy.common.HippyArray",
+			"Other_Gift_Ktv_Close_Method":"pushString",
+			//礼物列表
+			"Gift_List": "[{\"GiftId\":266,\"GiftPrice\":18,\"GiftLogo_str\":\"1347200\",\"GiftLogo\":\"1347201\",\"GiftName\":\"声优耳机\",\"f\":0,\"g\":1,\"h\":1,\"i\":false,\"j\":false},{\"GiftId\": 267,\"GiftPrice\": 18,\"GiftLogo_str\": \"1347250\",\"GiftLogo\":\"1347251\",\"GiftName\":\"解忧月亮\",\"f\":0,\"g\":1,\"h\":1,\"i\":false,\"j\":false}]",
+			"Gift_List_Class": "com.tencent.karaoke.module.giftpanel.ui.y",
+			"Gift_List_Method": "a",
+			"Gift_Data_Class": "com.tencent.karaoke.module.giftpanel.ui.GiftData",
+
+			//礼物监听
+			"Gift_Class": "com.tencent.karaoke.module.giftpanel.animation.widget.GiftUserBar",
+			"Gift_Method": "a",
+			"GiftInfo_Class": "com.tencent.karaoke.module.live.common.GiftInfo",
+			"UserInfo_Class": "PROTO_UGC_WEBAPP.UserInfo",
+			"Gift_onActivityResult_Class": "com.tencent.karaoke.base.ui.KtvContainerActivity",
+			"Gift_onActivityResult_Method": "onActivityResult"
+			
+		}
+	}
+}
