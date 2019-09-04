@@ -1,5 +1,7 @@
 package com.ms.karorkefz.xposed;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.AndroidAppHelper;
 import android.content.Context;
 import android.graphics.Color;
@@ -10,64 +12,129 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TableRow;
 
+import com.google.gson.Gson;
 import com.ms.karorkefz.BuildConfig;
 import com.ms.karorkefz.thread.XSingleThreadPool;
 import com.ms.karorkefz.util.Adapter;
+import com.ms.karorkefz.util.Constant;
 import com.ms.karorkefz.util.DpUtil;
 import com.ms.karorkefz.util.Log.LogUtil;
 import com.ms.karorkefz.util.TimeHook;
+import com.ms.karorkefz.util.ViewUtil;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static com.ms.karorkefz.util.Shot.getActivity;
 
 public class Karaoke_User_Hook {
     Adapter adapter;
     boolean kViewhook = false;
-    ArrayList vctUserList;
-    WeakReference four;
+    ArrayList<String> list = new ArrayList();
     XSingleThreadPool xSingleThreadPool = new XSingleThreadPool();
     private ClassLoader classLoader;
 
     Karaoke_User_Hook(ClassLoader mclassLoader) throws JSONException {
+
         classLoader = mclassLoader;
         this.adapter = new Adapter( "User" );
     }
 
-    public <WebappGetFollowerListRsp> void init() throws JSONException {
-        LogUtil.d( "karorkefz", "user" );
-        String h_Class = adapter.getString( "h_Class" );
-        Class h = XposedHelpers.findClass( h_Class, classLoader );
-        String i_Class = adapter.getString( "i_Class" );
-        Class i = XposedHelpers.findClass( i_Class, classLoader );
-        String WebappGetFollowerListRsp_Class = adapter.getString( "WebappGetFollowerListRsp_Class" );
-        Class WebappGetFollowerListRsp = XposedHelpers.findClass( WebappGetFollowerListRsp_Class, classLoader );
-        String View_Class = adapter.getString( "View_Class" );
-        String View_Method = adapter.getString( "View_Method" );
-        XposedHelpers.findAndHookMethod( View_Class,
-                classLoader,
-                View_Method,
-                LayoutInflater.class,
-                ViewGroup.class,
-                Bundle.class,
-                new XC_MethodHook() {
-                    protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                        String kFieldName = adapter.getString( "kFieldName" );
-                        Field kField = XposedHelpers.findField( param.thisObject.getClass(), kFieldName );
-                        View kView = (View) kField.get( param.thisObject );
-                        if (!kViewhook) {
+    public void init() {
+        try {
+            LogUtil.d( "karorkefz", "user" );
+            String CheckBox_View_Class_String = adapter.getString( "CheckBox_View_Class" );
+            String CheckBox_View_Method_String = adapter.getString( "CheckBox_View_Method" );
+            String CheckBox_View_oneClass_String = adapter.getString( "CheckBox_View_oneClass" );
+            String CheckBox_View_twoClass_String = adapter.getString( "CheckBox_View_twoClass" );
+            String CheckBox_View_fansUid_String = adapter.getString( "CheckBox_View_fansUid" );
+            String CheckBox_View_Field_String = adapter.getString( "CheckBox_View_Field" );
+
+            Class<?> CheckBox_View_oneClass = XposedHelpers.findClass( CheckBox_View_oneClass_String, classLoader );
+            Class<?> CheckBox_View_twoClass = XposedHelpers.findClass( CheckBox_View_twoClass_String, classLoader );
+            XposedHelpers.findAndHookMethod( CheckBox_View_Class_String, classLoader,
+                    CheckBox_View_Method_String,
+                    CheckBox_View_oneClass,
+                    CheckBox_View_twoClass,
+                    int.class,
+                    new XC_MethodHook() {
+                        @SuppressLint("ResourceType")
+                        protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                            Gson kGson = new Gson();
+                            String kVar2_jsonString = kGson.toJson( param.args[0] );
+                            LogUtil.i( "karorkefz", "Live_list:" + kVar2_jsonString );
+                            // 新建JSONObject
+                            JSONObject kVar2_JSONObject = new JSONObject( kVar2_jsonString );
+
+                            // 直接可得数据
+                            String fansUid = kVar2_JSONObject.getString( CheckBox_View_fansUid_String );//fansUid
+
+                            Field kField = XposedHelpers.findField( param.args[1].getClass(), CheckBox_View_Field_String );
+                            View kView = (View) kField.get( param.args[1] );
+
+                            TableRow fViewParent = (TableRow) kView.getParent();
+
+                            Context context = AndroidAppHelper.currentApplication();
+
+                            CheckBox selectBox;
+                            selectBox = new CheckBox( context );
+                            selectBox.setId( 0x962464 );
+                            selectBox.setContentDescription( fansUid );
+                            selectBox.setClickable( true );
+                            selectBox.setFocusable( true );
+                            selectBox.setFocusableInTouchMode( true );
+                            selectBox.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+                                @Override
+                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                    // TODO Auto-generated method stub
+                                    LogUtil.e( "karorkefz", "user添加复选框状态：" + isChecked );
+                                    if (isChecked) {
+                                        list.add( buttonView.getContentDescription().toString() );
+                                        LogUtil.e( "karorkefz", "user列表：" + list );
+                                    } else {
+                                        list.remove( buttonView.getContentDescription() );
+                                        LogUtil.e( "karorkefz", "user列表：" + list );
+                                    }
+                                }
+                            } );
+                            ViewUtil.getAllChildren( fViewParent );
+                            fViewParent.addView( selectBox );
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            LogUtil.e( "karorkefz", "添加复选框出错:" + e.getMessage() );
+        }
+        try {
+            String Delete_View_Class_String = adapter.getString( "Delete_View_Class" );
+            String Delete_View_Method_String = adapter.getString( "Delete_View_Method" );
+            String Delete_View_Field_String = adapter.getString( "Delete_View_Field" );
+
+            XposedHelpers.findAndHookMethod( Delete_View_Class_String,
+                    classLoader,
+                    Delete_View_Method_String,
+                    LayoutInflater.class,
+                    ViewGroup.class,
+                    Bundle.class,
+                    new XC_MethodHook() {
+                        protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                            Field kField = XposedHelpers.findField( param.thisObject.getClass(), Delete_View_Field_String );
+                            View kView = (View) kField.get( param.thisObject );
                             kViewhook = true;
                             RelativeLayout kViewParent = (RelativeLayout) kView.getParent();
                             LinearLayout Parent = (LinearLayout) kViewParent.getParent();
@@ -75,138 +142,106 @@ public class Karaoke_User_Hook {
                             FansView( Parent, context );
                         }
                     }
-                }
-        );
-        String Fan_List_Class = adapter.getString( "Fan_List_Class" );
-        String Fan_List_Method = adapter.getString( "Fan_List_Method" );
-        XposedHelpers.findAndHookMethod( Fan_List_Class,
-                classLoader,
-                Fan_List_Method,
-                h,
-                i,
-                new XC_MethodHook() {
-                    protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                        LogUtil.d( "karorkefz", "列表:" + param.args[0] );
-                        LogUtil.d( "karorkefz", "列表:" + param.args[1] );
-                        LogUtil.d( "karorkefz", "列表:" + param.getResult() );
-                        Object hObject = param.args[0];
-                        Object iObject = param.args[1];
-                        String requestType_Method = adapter.getString( "requestType_Method" );
-                        int requestType = (int) XposedHelpers.callMethod( hObject, requestType_Method );
-                        LogUtil.d( "karorkefz", "列表requestType:" + requestType );
-                        if (requestType == 5) {
-                            String c_Method = adapter.getString( "c_Method" );
-                            WebappGetFollowerListRsp c = (WebappGetFollowerListRsp) XposedHelpers.callMethod( iObject, c_Method );
-                            LogUtil.d( "karorkefz", "列表c:" + c );
-                            String vctUserListFieldName = adapter.getString( "vctUserListFieldName" );
-                            Field vctUserListField = XposedHelpers.findField( WebappGetFollowerListRsp, vctUserListFieldName );
-                            vctUserList = (ArrayList) vctUserListField.get( c );
-                            LogUtil.d( "karorkefz", "列表vctUserList:" + vctUserList );
-                        }
-                    }
-                } );
-        String JceStruct_Class = adapter.getString( "JceStruct_Class" );
-        Class JceStruct = XposedHelpers.findClass( JceStruct_Class, classLoader );
-        String a_Class = adapter.getString( "a_Class" );
-        Class a = XposedHelpers.findClass( a_Class, classLoader );
-        XposedHelpers.findAndHookConstructor( a,
-                String.class,
-                String.class,
-                JceStruct,
-                WeakReference.class,
-                Object[].class,
-                new XC_MethodHook() {
-                    protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                        LogUtil.d( "karorkefz", "网络发送参数:" + param.getResult() );
-                        LogUtil.d( "karorkefz", "网络发送参数，business.a:" + param.args[0] );
-                        LogUtil.d( "karorkefz", "网络发送参数，business.a:" + param.args[1] );
-                        LogUtil.d( "karorkefz", "网络发送参数，business.a:" + param.args[2] );
-                        LogUtil.d( "karorkefz", "网络发送参数，business.a:" + param.args[3] );
-                        LogUtil.d( "karorkefz", "网络发送参数，business.a:" + param.args[4] );
-                        String one = "relation.rmfan";
-                        if (param.args[0].equals( one )) {
-                            Field lUidField = XposedHelpers.findField( param.args[2].getClass(), "lUid" );
-                            long lUid = (long) lUidField.get( param.args[2] );
-                            Field lFanUidField = XposedHelpers.findField( param.args[2].getClass(), "lFanUid" );
-                            long lFanUid = (long) lFanUidField.get( param.args[2] );
-                            LogUtil.d( "karorkefz", "移除粉丝网络发送参数，business.a:" + lUid );
-                            LogUtil.d( "karorkefz", "移除粉丝网络发送参数，business.a:" + lFanUid );
-                            four = (WeakReference) param.args[3];
-                        }
-                    }
-                }
-        );
-
+            );
+        } catch (Exception e) {
+            LogUtil.e( "karorkefz", "添加删除按钮出错:" + e.getMessage() );
+        }
     }
 
     private void FansView(LinearLayout Parent, Context context) {
         LinearLayout settingsItemRootLLayout = new LinearLayout( context );
         settingsItemRootLLayout.setOrientation( LinearLayout.VERTICAL );
         settingsItemRootLLayout.setLayoutParams( new AbsListView.LayoutParams( MATCH_PARENT, WRAP_CONTENT ) );
+
+
         LinearLayout settingsItemLinearLayout = new LinearLayout( context );
         settingsItemLinearLayout.setOrientation( LinearLayout.VERTICAL );
         settingsItemLinearLayout.setLayoutParams( new ViewGroup.LayoutParams( MATCH_PARENT, WRAP_CONTENT ) );
+
+
         LinearLayout itemHlinearLayout = new LinearLayout( context );
         itemHlinearLayout.setOrientation( LinearLayout.HORIZONTAL );
         itemHlinearLayout.setWeightSum( 1 );
+
         itemHlinearLayout.setGravity( Gravity.CENTER_VERTICAL );
-        itemHlinearLayout.setClickable( true );
+
         Button delete = new Button( context );
-        delete.setText( "一键移除全部粉丝" );
+        delete.setText( "移除选中粉丝" );
         delete.setTextColor( Color.rgb( 128, 128, 128 ) );
         delete.setBackgroundColor( Color.WHITE );
         delete.setGravity( Gravity.CENTER );
         delete.setPadding( 0, 0, 0, 0 );
         delete.setTextSize( 14 );
         delete.setOnClickListener( view -> {
-            try {
-                deleteOnClick();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            new AlertDialog.Builder( getActivity() )
+                    .setTitle( "提示" )
+                    .setMessage( "确定移除选中粉丝？\n确定移除，请刷新粉丝列表，数据可能会有延迟。" )
+                    .setNegativeButton( "取消", null )
+                    .setPositiveButton( "确定", (dialogInterface, i) -> {
+                        try {
+                            deleteOnClick();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } )
+                    .create()
+                    .show();
+
         } );
+
+
         itemHlinearLayout.addView( delete, new LinearLayout.LayoutParams( MATCH_PARENT, MATCH_PARENT, 1 ) );
+
+
         View lineView = new View( context );
         lineView.setBackgroundColor( 0xFFD5D5D5 );
         settingsItemLinearLayout.addView( itemHlinearLayout, new LinearLayout.LayoutParams( MATCH_PARENT, DpUtil.dip2px( context, 50 ) ) );
         settingsItemLinearLayout.addView( lineView, new LinearLayout.LayoutParams( MATCH_PARENT, DpUtil.dip2px( context, 6 ) ) );
+
         settingsItemRootLLayout.addView( settingsItemLinearLayout );
         settingsItemRootLLayout.setTag( BuildConfig.APPLICATION_ID );
+
         Parent.addView( settingsItemRootLLayout, 1 );
     }
 
-    private <RelationUserInfo> void deleteOnClick() throws IllegalAccessException, InstantiationException, JSONException {
-        Iterator<RelationUserInfo> it = vctUserList.iterator();
-        while (it.hasNext()) {
-            RelationUserInfo relationuserinfo = it.next();
-            Field lUidField = XposedHelpers.findField( relationuserinfo.getClass(), "lUid" );
-            long lUid = (long) lUidField.get( relationuserinfo );
-            Field strNicknameField = XposedHelpers.findField( relationuserinfo.getClass(), "strNickname" );
-            String strNickname = (String) strNicknameField.get( relationuserinfo );
+    private void deleteOnClick() throws IllegalAccessException, InstantiationException, JSONException {
+        for (int i = 0; i < list.size(); i++) {
+            long lUid = Long.parseLong( list.get( i ) );
             send( lUid );
-            LogUtil.d( "karorkefz", "列表it: lUid: " + lUid + " strNickname: " + strNickname );
+            LogUtil.d( "karorkefz", "列表it: lUid: " + lUid );
         }
+        list.clear();
     }
 
     private <WebappRmFanReq> void send(long lUid) throws InstantiationException, IllegalAccessException {
-        String WebappRmFanReq_Class = adapter.getString( "WebappRmFanReq_Class" );
-        Class WebappRmFanReq = XposedHelpers.findClass( WebappRmFanReq_Class, classLoader );
-        String a_Class = adapter.getString( "a_Class" );
-        Class aClass = XposedHelpers.findClass( a_Class, classLoader );
+        try {
+        long myUid = Constant.uid;
+        String send_Class_String = adapter.getString( "send_Class" );
+        Class send_Class = XposedHelpers.findClass( send_Class_String, classLoader );
+
         String one = "relation.rmfan";
-        String two = "71190071";
-        WebappRmFanReq webapprmfanreq = (WebappRmFanReq) WebappRmFanReq.newInstance();
-        XposedHelpers.setLongField( webapprmfanreq, "lUid", 71190071 );
+        String two = String.valueOf( myUid );
+
+        String send_oneClass_String = adapter.getString( "send_oneClass" );
+        Class send_oneClass = XposedHelpers.findClass( send_oneClass_String, classLoader );
+        WebappRmFanReq webapprmfanreq = (WebappRmFanReq) send_oneClass.newInstance();
+        XposedHelpers.setLongField( webapprmfanreq, "lUid", myUid );
         XposedHelpers.setLongField( webapprmfanreq, "lFanUid", lUid );
         WebappRmFanReq three = webapprmfanreq;
+
+        WeakReference four = null;
         Object[] five = new Object[0];
-        Object a = XposedHelpers.newInstance( aClass, one, two, three, four, five );
+
+        Object a = XposedHelpers.newInstance( send_Class, one, two, three, four, five );
+
         xSingleThreadPool.add( new Runnable() {
             public void run() {
                 LogUtil.d( "karorkefz", "线程:" + TimeHook.SimpleDateFormat_Time() );
-                XposedHelpers.callMethod( a, "b" );
+                XposedHelpers.callMethod( a, "j" );
             }
         }, 1000 );
-
+        } catch (Exception e) {
+            LogUtil.e( "karorkefz", "移除粉丝发送数据出错:" + e.getMessage() );
+        }
     }
 }

@@ -18,7 +18,7 @@ public class Adapter {
             String jsonString = dataObject.getString( name );
             this.adapterJsonObject = new JSONObject( jsonString );
         } catch (Exception e) {
-            String adapterString = "{\"version\": \"6.5.3.275\",\"data\": {\"adapter\": {\"version\": \"false\"}}}";
+            String adapterString = "{\"version\": \"6.8.1.273\",\"data\": {\"adapter\": {\"version\": \"ture\"},\"Setting\": {},\"Notification\": {},\"KaraScore\": {},\"Ktv\": {},\"Live\": {},\"User\": {},\"Other\": {}}}";
             JSONObject jsonObject = new JSONObject( adapterString );
             String dataString = jsonObject.getString( "data" );
             JSONObject dataObject = new JSONObject( dataString );

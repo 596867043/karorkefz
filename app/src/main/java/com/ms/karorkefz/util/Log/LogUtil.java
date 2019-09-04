@@ -32,7 +32,7 @@ public class LogUtil {
             LOG_LEVEL = Log_Level;
             logFileEnable = Log;
 
-            String logFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/moshou/Log/Hook.txt";
+            String logFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/moshou/Log/Hook.txt";
             File file = new File( logFilePath );
             try {
                 if (!file.getParentFile().exists()) {

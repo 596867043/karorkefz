@@ -64,14 +64,21 @@ public class PreferenceAdapter extends BaseAdapter {
         public String title;
         public String subTitle;
         public String key;
+        public String url;
         public boolean isSelection;
         public boolean selectionState;
 
-        public Data(String title, String subTitle, String key) {
 
+
+        public Data(String title, String subTitle, String key) {
             this( title, subTitle, key, false, false );
         }
-
+        public Data(String title, String subTitle, String key, String url) {
+            this.title = title;
+            this.subTitle = subTitle;
+            this.key = key;
+            this.url = url;
+        }
         public Data(String title, String subTitle, String key, boolean isSelection, boolean selectionState) {
             this.title = title;
             this.subTitle = subTitle;

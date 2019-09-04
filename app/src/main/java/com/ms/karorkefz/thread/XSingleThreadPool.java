@@ -40,8 +40,13 @@ public class XSingleThreadPool {
                 try {
                     Runnable r;
                     synchronized (this.lock) {
-                        r = runList.get( 0 );
-                        runList.remove( 0 );
+                        try {
+                            r = runList.get( 0 );
+                            runList.remove( 0 );
+                        } catch (Exception e) {
+                            LogUtil.e( "karorkefz", "核心线程:获取新线程出错" );
+                            break;
+                        }
                     }
                     r.run();
                     synchronized (this.lock) {

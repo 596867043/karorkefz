@@ -1,8 +1,11 @@
 package com.ms.karorkefz.activity;
 
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,35 +20,30 @@ import android.widget.Toast;
 import com.ms.karorkefz.BuildConfig;
 import com.ms.karorkefz.R;
 import com.ms.karorkefz.adapter.PreferenceAdapter;
+import com.ms.karorkefz.util.Constant;
+import com.ms.karorkefz.util.Update.Adapter;
 import com.ms.karorkefz.xposed.HookStatue;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ms.karorkefz.util.Constant.Setting_list;
+import static com.ms.karorkefz.util.Constant.url;
+
 public class HomeActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-
-
     private PreferenceAdapter mListAdapter;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.home );
-
-
         ListView listView = (ListView) findViewById( R.id.list );
         List<PreferenceAdapter.Data> list = new ArrayList<>();
-        list.add( new PreferenceAdapter.Data( "启动页广告关闭", "查看使用教程", "enableStart" ) );
-        list.add( new PreferenceAdapter.Data( "移除粉丝", "查看使用教程", "enableFansDelete" ) );
-        list.add( new PreferenceAdapter.Data( "歌房功能", "查看使用教程", "enableKTV" ) );
-        list.add( new PreferenceAdapter.Data( "歌房滑动禁用", "查看使用教程", "enableKTV_cS" ) );
-        list.add( new PreferenceAdapter.Data( "歌房语音席点击触发", "查看使用教程", "enableKTVY" ) );
-        list.add( new PreferenceAdapter.Data( "歌房密码自动输入", "查看使用教程", "enableKTVIN" ) );
-        list.add( new PreferenceAdapter.Data( "直播间功能", "查看使用教程", "enableLIVE" ) );
-        list.add( new PreferenceAdapter.Data( "直播间滑动禁用", "查看使用教程", "enableLIVE_cS" ) );
-        list.add( new PreferenceAdapter.Data( "直播间自动欢迎", "查看使用教程", "enableLIVE_W" ) );
-        list.add( new PreferenceAdapter.Data( "直播间自动欢迎语", "查看使用教程", "enableLIVE_W_N" ) );
-        list.add( new PreferenceAdapter.Data( "直播间礼物截屏", "查看使用教程", "enableLIVE_Gift" ) );
-
+        for (int i = 0; i < Setting_list.size(); i++) {
+            Constant.Setting setting = (Constant.Setting) Setting_list.get( i );
+            list.add( new PreferenceAdapter.Data( setting.title, "点击查看教程", setting.key, setting.url ) );
+        }
         String statue;
         if (HookStatue.isEnabled()) statue = "模块已激活";
         else if (HookStatue.isExpModuleActive( this )) statue = "太极已激活";
@@ -54,55 +52,59 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         list.add( new PreferenceAdapter.Data( "状态", statue, "statue" ) );
         list.add( new PreferenceAdapter.Data( "项目地址", "https://github.com/jiumoshou/karorkefz", "github" ) );
-        list.add( new PreferenceAdapter.Data( "联系Q群", "1004952748", "Contact" ) );
+//        list.add( new PreferenceAdapter.Data( "联系Q群", "1004952748", "Contact" ) );
         list.add( new PreferenceAdapter.Data( "版本", BuildConfig.VERSION_NAME, "version" ) );
         mListAdapter = new PreferenceAdapter( list );
         listView.setAdapter( mListAdapter );
         listView.setOnItemClickListener( this );
+//        CheckPoster();
+        try {
+            Adapter.getAdapter( this );
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void CheckPoster() {
+        int Build_Code = BuildConfig.VERSION_CODE;
+        SharedPreferences sharedPreferences = getSharedPreferences( "settings", Context.MODE_PRIVATE );
+        int sp_Code = sharedPreferences.getInt( "code", 0 );
+        if (Build_Code != sp_Code) {
+            this.runOnUiThread( () -> {
+                new AlertDialog.Builder( this )
+                        .setTitle( "请求赞助" )
+                        .setMessage( "本人还未工作，无法继续支撑服务器费用，请各位大佬加群赞助一下每个月10块钱的费用，谢谢。" )
+                        .setNegativeButton( "取消", null )
+                        .setPositiveButton( "赞助", (dialogInterface, i) -> {
+                            joinQQGroup();
+                        } )
+                        .create()
+                        .show();
+                sharedPreferences.edit().putInt( "code", Build_Code ).apply();
+            } );
+        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         PreferenceAdapter.Data data = mListAdapter.getItem( i );
-        String url = "http://60.205.227.119/karorkefz/";
-        if (data == null || TextUtils.isEmpty( data.title )) {
+        if (data == null || TextUtils.isEmpty( data.title ) ) {
             return;
-        }
-        if ("启动页广告关闭".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction" );
-        } else if ("移除粉丝".equals( data.title )) {
-//            WebActivity.openUrl( this, url + "Introduction/ktv.html" );
-        } else if ("歌房功能".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction/ktv.html" );
-        } else if ("歌房语音席点击触发".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction/ktv.html" );
-        } else if ("歌房密码自动输入".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction/ktv.html" );
-        } else if ("歌房滑动禁用".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction/ktv.html" );
-        } else if ("直播间功能".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction/live.html" );
-        } else if ("直播间滑动禁用".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction/live.html" );
-        } else if ("直播间自动欢迎".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction/live.html" );
-        } else if ("直播间自动欢迎语".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction/live.html" );
-        } else if ("直播间礼物截屏".equals( data.title )) {
-            WebActivity.openUrl( this, url + "Introduction/live.html" );
         } else if ("状态".equals( data.title )) {
             if ("模块未激活".equals( data.subTitle )) {
                 statue();
             }
         } else if ("项目地址".equals( data.title )) {
-            WebActivity.openUrl( this, data.subTitle );
+            WebActivity.openUrl( this, "https://github.com/jiumoshou/karorkefz" );
         } else if ("联系Q群".equals( data.title )) {
             joinQQGroup();
         } else if ("版本".equals( data.title )) {
             Intent intent = new Intent();
             intent.setAction( "android.intent.action.VIEW" );
-            intent.setData( Uri.parse( "http://60.205.227.119/karorkefz" ) );
+            intent.setData( Uri.parse( url ) );
             HomeActivity.this.startActivity( intent );
+        } else if(! TextUtils.isEmpty( data.url )){
+            WebActivity.openUrl( this, url + data.url );
         }
     }
 
@@ -144,7 +146,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
         return true;
     }
 
-    private boolean joinQQGroup() {
+    boolean joinQQGroup() {
         String key = "AF4gXBHuhdkO2CsIrTFJ-rHYhL5MDtQp";
         Intent intent = new Intent();
         intent.setData( Uri.parse( "mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26k%3D" + key ) );
@@ -156,6 +158,5 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
             return false;
         }
     }
-
 }
 

@@ -14,7 +14,7 @@ public class init implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
 
-        LogUtil.v( "karorkefz", "进入init" );
+//        LogUtil.v( "karorkefz", "进入init" );
         if (lpparam.packageName.equals( "com.ms.karorkefz" )) {
             findAndHookMethod( "com.ms.karorkefz.xposed.HookStatue", lpparam.classLoader, "isEnabled", XC_MethodReplacement.returnConstant( true ) );
             return;
@@ -22,11 +22,11 @@ public class init implements IXposedHookLoadPackage {
         Adapter adapter = new Adapter( "adapter" );
         String adapter_version = adapter.getString( "version" );
         if (adapter_version.equals( "false" )) {
-            LogUtil.v( "karorkefz", "适配文件有误" );
+//            LogUtil.v( "karorkefz", "适配文件有误" );
             return;
         }
         if (lpparam.packageName.equals( "com.tencent.karaoke" )) {
-            LogUtil.v( "karorkefz", "init-if包" );
+//            LogUtil.v( "karorkefz", "init-if包" );
             new KaraokeHook().init();
         }
     }

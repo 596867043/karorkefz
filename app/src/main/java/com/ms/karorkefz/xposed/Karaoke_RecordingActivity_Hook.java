@@ -2,6 +2,8 @@ package com.ms.karorkefz.xposed;
 
 import com.ms.karorkefz.util.Log.LogUtil;
 
+import org.json.JSONException;
+
 public class Karaoke_RecordingActivity_Hook {
     int i;
     private ClassLoader classLoader;
@@ -11,7 +13,7 @@ public class Karaoke_RecordingActivity_Hook {
         classLoader = mclassLoader;
     }
 
-    public void init() {
+    public void init() throws JSONException {
         LogUtil.d( "karorkefz", "进入RecordingActivity" );
         new Karaoke_KaraScore_Hook( classLoader ).init();
     }
