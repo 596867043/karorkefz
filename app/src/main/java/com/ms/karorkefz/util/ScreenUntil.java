@@ -201,8 +201,7 @@ public class ScreenUntil {
     public String getSavePath() {
         if (Environment.getExternalStorageState()
                 .equals( Environment.MEDIA_MOUNTED )) {
-            String rootDir = Environment.getExternalStorageDirectory()
-                    .getAbsolutePath() + FILE_PATH+"/ScreenRecord/";
+            String rootDir = FILE_PATH+"/ScreenRecord/";
             Log.e( "karorkefz", "rootDir:" + rootDir );
             File file = new File( rootDir );
             if (!file.exists()) {

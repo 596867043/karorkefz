@@ -23,6 +23,9 @@
         android:key="DeleteApdate"
         android:title="删除本地适配文件" />
     <Preference
+        android:key="gift_update"
+        android:title="礼物更新" />
+    <Preference
         android:key="adapter"
         android:title="检查适配更新" />
     <Preference

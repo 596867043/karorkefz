@@ -21,6 +21,10 @@ import com.ms.karorkefz.util.Update.Update;
 
 import org.json.JSONException;
 
+import static com.ms.karorkefz.util.Constant.author;
+import static com.ms.karorkefz.util.Constant.open;
+import static com.ms.karorkefz.util.Update.Gift.Gift_List;
+
 /**
  * Created by Jason on 2017/11/24.
  */
@@ -97,6 +101,14 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
                                          Preference preference) {
         switch (preference.getKey()) {
+            case "gift_update":
+                if (open && author) {
+                    Toast.makeText( this, "礼物更新中...", Toast.LENGTH_SHORT ).show();
+                    Gift_List();
+                    return true;
+                } else {
+                    Toast.makeText( this, "你估计在逗我....", Toast.LENGTH_SHORT ).show();
+                }
             case "DeleteLog":
                 DeleteLog();
                 return true;

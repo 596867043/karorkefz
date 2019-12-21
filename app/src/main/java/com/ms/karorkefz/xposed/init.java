@@ -1,7 +1,9 @@
 package com.ms.karorkefz.xposed;
 
+import android.util.Log;
+
 import com.ms.karorkefz.util.Adapter;
-import com.ms.karorkefz.util.Log.LogUtil;
+import com.ms.karorkefz.xposed.mysqlclient.mysqlclient;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodReplacement;
@@ -14,20 +16,27 @@ public class init implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
 
-//        LogUtil.v( "karorkefz", "进入init" );
+        Log.v( "karorkefz", "进入init" );
         if (lpparam.packageName.equals( "com.ms.karorkefz" )) {
             findAndHookMethod( "com.ms.karorkefz.xposed.HookStatue", lpparam.classLoader, "isEnabled", XC_MethodReplacement.returnConstant( true ) );
             return;
         }
-        Adapter adapter = new Adapter( "adapter" );
-        String adapter_version = adapter.getString( "version" );
-        if (adapter_version.equals( "false" )) {
-//            LogUtil.v( "karorkefz", "适配文件有误" );
-            return;
-        }
         if (lpparam.packageName.equals( "com.tencent.karaoke" )) {
-//            LogUtil.v( "karorkefz", "init-if包" );
-            new KaraokeHook().init();
+            Log.v( "karorkefz", "init-if包" );
+            Adapter adapter = new Adapter( "adapter" );
+            String adapter_version = adapter.getString( "version" );
+
+            if (adapter_version.equals( "false" )) {
+            Log.v( "karorkefz", "适配文件有误" );
+                return;
+            } else {
+                Log.v( "karorkefz", "适配通过" );
+                new KaraokeHook().init();
+            }
+        }
+        if (false&&lpparam.packageName.equals( "com.vcrox.mysqlclient" )) {
+            Log.v( "karorkefz", "找到mysqlclient" );
+            new mysqlclient(lpparam.classLoader).init();
         }
     }
 }

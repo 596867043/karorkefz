@@ -215,31 +215,31 @@ public class Karaoke_User_Hook {
 
     private <WebappRmFanReq> void send(long lUid) throws InstantiationException, IllegalAccessException {
         try {
-        long myUid = Constant.uid;
-        String send_Class_String = adapter.getString( "send_Class" );
-        Class send_Class = XposedHelpers.findClass( send_Class_String, classLoader );
+            long myUid = Constant.uid;
+            String send_Class_String = adapter.getString( "send_Class" );
+            Class send_Class = XposedHelpers.findClass( send_Class_String, classLoader );
 
-        String one = "relation.rmfan";
-        String two = String.valueOf( myUid );
+            String one = "relation.rmfan";
+            String two = String.valueOf( myUid );
 
-        String send_oneClass_String = adapter.getString( "send_oneClass" );
-        Class send_oneClass = XposedHelpers.findClass( send_oneClass_String, classLoader );
-        WebappRmFanReq webapprmfanreq = (WebappRmFanReq) send_oneClass.newInstance();
-        XposedHelpers.setLongField( webapprmfanreq, "lUid", myUid );
-        XposedHelpers.setLongField( webapprmfanreq, "lFanUid", lUid );
-        WebappRmFanReq three = webapprmfanreq;
+            String send_oneClass_String = adapter.getString( "send_oneClass" );
+            Class send_oneClass = XposedHelpers.findClass( send_oneClass_String, classLoader );
+            WebappRmFanReq webapprmfanreq = (WebappRmFanReq) send_oneClass.newInstance();
+            XposedHelpers.setLongField( webapprmfanreq, "lUid", myUid );
+            XposedHelpers.setLongField( webapprmfanreq, "lFanUid", lUid );
+            WebappRmFanReq three = webapprmfanreq;
 
-        WeakReference four = null;
-        Object[] five = new Object[0];
+            WeakReference four = null;
+            Object[] five = new Object[0];
 
-        Object a = XposedHelpers.newInstance( send_Class, one, two, three, four, five );
+            Object a = XposedHelpers.newInstance( send_Class, one, two, three, four, five );
 
-        xSingleThreadPool.add( new Runnable() {
-            public void run() {
-                LogUtil.d( "karorkefz", "线程:" + TimeHook.SimpleDateFormat_Time() );
-                XposedHelpers.callMethod( a, "j" );
-            }
-        }, 1000 );
+            xSingleThreadPool.add( new Runnable() {
+                public void run() {
+                    LogUtil.d( "karorkefz", "线程:" + TimeHook.SimpleDateFormat_Time() );
+                    XposedHelpers.callMethod( a, "j" );
+                }
+            }, 1000 );
         } catch (Exception e) {
             LogUtil.e( "karorkefz", "移除粉丝发送数据出错:" + e.getMessage() );
         }

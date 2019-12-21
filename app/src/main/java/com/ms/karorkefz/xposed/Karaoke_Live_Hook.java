@@ -88,10 +88,13 @@ class Karaoke_Live_Hook {
                             }
                         } );
                 //监听自己发送
-                Class<?> LiveFragment = XposedHelpers.findClass( "com.tencent.karaoke.module.live.ui.LiveFragment", classLoader );
-                XposedHelpers.findAndHookMethod( "com.tencent.karaoke.module.live.ui.LiveFragment",
+                String Robot_Listener_my_Class = adapter.getString( "Robot_Listener_my_Class" );
+                String Robot_Listener_my_Method = adapter.getString( "Robot_Listener_my_Method" );
+                String Robot_Listener_my_Class_one = adapter.getString( "Robot_Listener_my_Class_one" );
+                Class<?> LiveFragment = XposedHelpers.findClass( Robot_Listener_my_Class_one, classLoader );
+                XposedHelpers.findAndHookMethod( Robot_Listener_my_Class,
                         classLoader,
-                        "f",// 被Hook的函数
+                        Robot_Listener_my_Method,// 被Hook的函数
                         LiveFragment,
                         String.class,
                         new XC_MethodHook() {

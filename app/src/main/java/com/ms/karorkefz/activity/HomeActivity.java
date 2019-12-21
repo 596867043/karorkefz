@@ -57,7 +57,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
         mListAdapter = new PreferenceAdapter( list );
         listView.setAdapter( mListAdapter );
         listView.setOnItemClickListener( this );
-//        CheckPoster();
+        CheckPoster();
         try {
             Adapter.getAdapter( this );
         } catch (JSONException e) {
@@ -72,12 +72,10 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
         if (Build_Code != sp_Code) {
             this.runOnUiThread( () -> {
                 new AlertDialog.Builder( this )
-                        .setTitle( "请求赞助" )
-                        .setMessage( "本人还未工作，无法继续支撑服务器费用，请各位大佬加群赞助一下每个月10块钱的费用，谢谢。" )
-                        .setNegativeButton( "取消", null )
-                        .setPositiveButton( "赞助", (dialogInterface, i) -> {
-                            joinQQGroup();
-                        } )
+                        .setTitle( "温馨提示" )
+                        .setMessage( "此软件为免费开源软件，若有任何收费、盗版情况，出了问题，作者概不负责。" )
+//                        .setNegativeButton( "取消", null )
+                        .setPositiveButton( "确定", null )
                         .create()
                         .show();
                 sharedPreferences.edit().putInt( "code", Build_Code ).apply();

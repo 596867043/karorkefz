@@ -14,13 +14,15 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
+import static com.ms.karorkefz.util.Constant.open;
+
 public class KaraokeHook {
-    boolean enableStart, enableFansDelete, enableKTV, enableLIVE, enableRecording,enableOther;
+    boolean enableStart, enableFansDelete, enableKTV, enableLIVE, enableRecording, enableOther;
     Config config;
     Adapter adapter;
     String View_Class;
 
-    {
+    public KaraokeHook(){
         try {
             adapter = new Adapter( "Setting" );
             View_Class = adapter.getString( "View_Class" );
@@ -28,10 +30,12 @@ public class KaraokeHook {
             e.printStackTrace();
         }
     }
+
     public void init() {
         LogUtil.v( "karorkefz", "进入Karorke" );
         XposedHelpers.findAndHookMethod( Instrumentation.class, "callApplicationOnCreate", Application.class, new XC_MethodHook() {
             private boolean mCalled = false;
+
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (mCalled == false) {
                     mCalled = true;
@@ -82,10 +86,10 @@ public class KaraokeHook {
                     LogUtil.v( "karorkefz", "Karorke-准备加载 歌曲录制" );
                     new Karaoke_RecordingActivity_Hook( cls.getClassLoader() ).init();
                 }
-                if(enableOther&&name.equals("com.tencent.karaoke.module.splash.ui.SplashBaseActivity" )){
+                if (enableOther && name.equals( "com.tencent.karaoke.module.splash.ui.SplashBaseActivity" )) {
                     enableOther = false;
-//                    new Karaoke_Gift_Hook( cls.getClassLoader() ).init();
-                    new Karaoke_Other_Hook( cls.getClassLoader(),config ).init();//其他功能
+                    new Karaoke_Other_Hook( cls.getClassLoader(), config ).init();//其他功能
+                    new Karaoke_ceshi_Hook( cls.getClassLoader(), config ).init();//其他功能
                 }
             }
         } );

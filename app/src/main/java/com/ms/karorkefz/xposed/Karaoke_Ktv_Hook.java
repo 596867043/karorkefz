@@ -1,7 +1,10 @@
 package com.ms.karorkefz.xposed;
 
+import android.annotation.SuppressLint;
 import android.app.AndroidAppHelper;
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +16,7 @@ import com.ms.karorkefz.util.Adapter;
 import com.ms.karorkefz.util.ChatList;
 import com.ms.karorkefz.util.ColationList;
 import com.ms.karorkefz.util.Config;
+import com.ms.karorkefz.util.Constant;
 import com.ms.karorkefz.util.FileUtil;
 import com.ms.karorkefz.util.Log.LogUtil;
 import com.ms.karorkefz.util.TimeHook;
@@ -34,15 +38,19 @@ import static com.ms.karorkefz.util.ColationList.colationKtvList;
 class Karaoke_Ktv_Hook extends RoomPasswordDialogViewAdd {
     Config config;
     Adapter adapter;
-    boolean enableKTV_cS, enableKTVY, enableKTVIN, enableKTV_Robot, enableRecording;
+    boolean enableKTV_cS, enableKTVY, enableKTVIN, enableKTV_Robot, enableRecording, Auto_Song;
     boolean start = false;
     boolean b = false;
     Object hObject, h$26Object, WeObject;
     WeakReference one;
+    String strRoomId, strShowId;
     com.ms.karorkefz.util.ColationList ColationList;
     private ClassLoader classLoader;
     private EditText inputEditText;
     private int i = 0000;
+    static Object Song_inquiry, KtvDownloadObbDialog, l;
+    static int list = 0, update = 0;
+    static ArrayList SongList;
 
     Karaoke_Ktv_Hook(ClassLoader mclassLoader, Config config) throws JSONException {
 
@@ -54,6 +62,8 @@ class Karaoke_Ktv_Hook extends RoomPasswordDialogViewAdd {
         enableKTVIN = config.isOn( "enableKTVIN" );
         enableKTV_Robot = config.isOn( "enableKTV_Robot" );
         enableRecording = config.isOn( "enableRecording" );
+        Auto_Song = config.isOn( "enableKTV_Auto_Song" );
+
 
         ColationList = new ColationList();
     }
@@ -228,12 +238,14 @@ class Karaoke_Ktv_Hook extends RoomPasswordDialogViewAdd {
                                 LogUtil.d( "karorkefz", String.valueOf( param.args[4] ) );
                                 LogUtil.d( "karorkefz", String.valueOf( param.args[5] ) );
                                 one = (WeakReference) param.args[0];
+                                strRoomId = String.valueOf( param.args[1] );
+                                strShowId = String.valueOf( param.args[2] );
                             }
                         } );
-                Class<?> We = XposedHelpers.findClass( "com.tencent.karaoke.module.ktv.ui.We", classLoader );
-
-                XposedHelpers.findAndHookConstructor( "com.tencent.karaoke.module.ktv.ui.Ie", classLoader,
-                        We,
+                String Robot_Listener_my_Class = adapter.getString( "Robot_Listener_my_Class" );
+                String Robot_Listener_my_Class_one = adapter.getString( "Robot_Listener_my_Class_one" );
+                XposedHelpers.findAndHookConstructor( Robot_Listener_my_Class, classLoader,
+                        XposedHelpers.findClass( Robot_Listener_my_Class_one, classLoader ),
                         new XC_MethodHook() {
                             protected void beforeHookedMethod(final MethodHookParam param) throws Throwable {
                                 LogUtil.d( "karorkefz", "Ktv-监听自己发送" );
@@ -259,11 +271,189 @@ class Karaoke_Ktv_Hook extends RoomPasswordDialogViewAdd {
                                     } else {
                                         send( sendq.getType(), sendq.getUid(), sendq.getText() );
                                     }
+                                    if (sendq.getText().indexOf( "开启自动点歌" ) != -1) Song_inquiry();
                                 }
                             }
                         } );
             } catch (Exception e) {
                 LogUtil.w( "karorkefz", "歌房机器人出错:" + e.getMessage() );
+            }
+        }
+        //自动点歌
+        if (Auto_Song) {
+            boolean Auto_wheat = config.isOn( "enableKTV_Auto_wheat" );
+            boolean Auto_Song_inquiry = config.isOn( "enableKTV_Auto_Song_inquiry" );
+            boolean Auto_Listener_Song_List = config.isOn( "enableKTV_Auto_Listener_Song_List" );
+            if (Auto_wheat) {
+                //音频上麦按钮点击
+                String InformGetMicDialog_Class_String = adapter.getString( "InformGetMicDialog_Class" );
+                String InformGetMicDialog_Class_one_String = adapter.getString( "InformGetMicDialog_one_Class" );
+                XposedHelpers.findAndHookConstructor( InformGetMicDialog_Class_String,
+                        classLoader,
+                        XposedHelpers.findClass( InformGetMicDialog_Class_one_String, classLoader ),
+                        new XC_MethodHook() {
+                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                                LogUtil.d( "karorkefz", "InformGetMicDialog:" + param.args[0] );
+                                new Thread() {
+                                    @SuppressLint("ResourceType")
+                                    public void run() {
+                                        try {
+                                            String Mic_Button_String = adapter.getString( "Mic_Button" );
+                                            String Mic_onClick_Method_String = adapter.getString( "Mic_onClick_Method" );
+                                            sleep( 5000 );
+                                            View view = new View( AndroidAppHelper.currentApplication() );
+                                            view.setId( Integer.parseInt( Mic_Button_String, 16 ) );
+                                            XposedHelpers.callMethod( param.thisObject, Mic_onClick_Method_String, view );
+                                            LogUtil.d( "karorkefz", "InformGetMicDialog点击" );
+                                            sleep( 5000 );
+
+                                            String KaraokeContext_String = adapter.getString( "KaraokeContext" );
+                                            Class KaraokeContext = XposedHelpers.findClass( KaraokeContext_String, classLoader );
+                                            Object KaraokeContextObject = KaraokeContext.newInstance();
+
+                                            String getKtvController_String = adapter.getString( "getKtvController" );
+                                            Object KtvController = XposedHelpers.callMethod( KaraokeContextObject, getKtvController_String );
+
+                                            String Original_String = adapter.getString( "Original" );
+                                            XposedHelpers.callMethod( KtvController, Original_String, false );
+                                            LogUtil.d( "karorkefz", "打开原唱" );
+                                        } catch (InterruptedException | IllegalAccessException | InstantiationException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }.start();
+                            }
+                        } );
+            }
+            if (Auto_Song_inquiry) {
+                //自动点歌
+                //歌曲列表监听
+                String Listener_Music_List_Class_String = adapter.getString( "Listener_Music_List_Class" );
+                String Listener_Music_List_Method_String = adapter.getString( "Listener_Music_List_Method" );
+                XposedHelpers.findAndHookMethod( Listener_Music_List_Class_String,
+                        classLoader,
+                        Listener_Music_List_Method_String,
+                        List.class,
+                        new XC_MethodHook() {
+                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                                LogUtil.i( "karorkefz", "Music_List:update:" + param.args[0] );
+                                SongList = (ArrayList) param.args[0];
+                            }
+                        } );
+                //歌曲信息发送
+                String Music_Send_Class_String = adapter.getString( "Music_Send_Class" );
+                String Music_Send_Class_one = adapter.getString( "Music_Send_Class_one" );
+                XposedHelpers.findAndHookConstructor( Music_Send_Class_String,
+                        classLoader,
+                        XposedHelpers.findClass( Music_Send_Class_one, classLoader ),
+                        int.class,
+                        new XC_MethodHook() {
+                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                                LogUtil.i( "karorkefz", "KtvDownloadObbDialog:" + param.args[0] );
+                                LogUtil.i( "karorkefz", "KtvDownloadObbDialog:" + param.args[1] );
+                                KtvDownloadObbDialog = param.thisObject;
+                            }
+                        } );
+                //启动点歌
+                String Start_Send_Class_String = adapter.getString( "Start_Send_Class" );
+                String Start_Send_Class_one = adapter.getString( "Start_Send_Class_one" );
+                String Start_Send_Class_two = adapter.getString( "Start_Send_Class_two" );
+                XposedHelpers.findAndHookConstructor( Start_Send_Class_String,
+                        classLoader,
+                        XposedHelpers.findClass( Start_Send_Class_one, classLoader ),
+                        XposedHelpers.findClass( Start_Send_Class_two, classLoader ),
+                        new XC_MethodHook() {
+                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                                LogUtil.i( "karorkefz", "zg:" + param.args[0] );
+                                LogUtil.i( "karorkefz", "zg:" + param.args[1] );
+                                Song_inquiry = param.thisObject;
+                            }
+                        } );
+
+
+                //下麦监听
+                String Listener_Mic_down_Class_String = adapter.getString( "Listener_Mic_down_Class" );
+                String Listener_Mic_down_Method_String = adapter.getString( "Listener_Mic_down_Method" );
+                String Listener_Mic_down_oneClass_String = adapter.getString( "Listener_Mic_down_oneClass" );
+                XposedHelpers.findAndHookMethod( Listener_Mic_down_Class_String,
+                        classLoader,
+                        Listener_Mic_down_Method_String,
+                        XposedHelpers.findClass( Listener_Mic_down_oneClass_String, classLoader ),
+                        new XC_MethodHook() {
+                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                                Gson kGson = new Gson();
+                                String kVar2_jsonString = kGson.toJson( param.args[0] );
+                                LogUtil.e( "karorkefz", kVar2_jsonString );
+                                JSONObject kVar2_JSONObject = new JSONObject( kVar2_jsonString );
+                                try {
+                                    // 直接可得数据
+                                    String Listener_Mic_down_mapExt = adapter.getString( "Listener_Mic_down_mapExt" );
+                                    String mapExt_jsonString = kVar2_JSONObject.getString( Listener_Mic_down_mapExt );
+                                    JSONObject mapExt_JSONObject = new JSONObject( mapExt_jsonString );
+                                    // 直接可得数据
+                                    String Listener_Mic_down_reason = adapter.getString( "Listener_Mic_down_reason" );
+                                    String reason = mapExt_JSONObject.getString( Listener_Mic_down_reason );
+
+                                    // 直接可得数据
+                                    String Listener_Mic_down_stActUser = adapter.getString( "Listener_Mic_down_stActUser" );
+                                    String stActUser_jsonString = kVar2_JSONObject.getString( Listener_Mic_down_stActUser );
+                                    JSONObject stActUser_JSONObject = new JSONObject( stActUser_jsonString );
+                                    // 直接可得数据
+                                    String Listener_Mic_down_uid = adapter.getString( "Listener_Mic_down_uid" );
+                                    int uid = stActUser_JSONObject.getInt( Listener_Mic_down_uid );
+                                    LogUtil.e( "karorkefz", "reason:" + reason + "uid:" + uid );
+                                    if (reason.equals( "领唱下麦了" )) {
+                                        update = 0;
+                                        if (uid == Constant.uid) {
+                                            LogUtil.e( "karorkefz", "监听再次调用" );
+                                            Song_inquiry();
+                                        }
+                                    }
+                                    if (reason.equals( "歌曲播放结束，系统自动切麦了~" )) {
+                                        if (Song_inquiry == null) return;
+                                        if (++update == 5) {
+                                            Song_inquiry();
+                                            update = 0;
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    LogUtil.e( "karorkefz", "监听下麦错误：" + e.getMessage() );
+                                }
+                            }
+                        } );
+            }
+            if (Auto_Listener_Song_List) {
+                //抓取麦序数据
+                String Listener_Song_List_Class_String = adapter.getString( "Listener_Song_List_Class" );
+                String Listener_Song_List_Method_String = adapter.getString( "Listener_Song_List_Method" );
+                XposedHelpers.findAndHookMethod( Listener_Song_List_Class_String,
+                        classLoader,
+                        Listener_Song_List_Method_String,
+                        ArrayList.class,
+                        new XC_MethodHook() {
+                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                                ArrayList list = (ArrayList) param.args[0];
+                                if (list.size() > 1) {
+                                    String KaraokeContext_String = adapter.getString( "KaraokeContext" );
+                                    Class KaraokeContext = XposedHelpers.findClass( KaraokeContext_String, classLoader );
+                                    Object KaraokeContextObject = KaraokeContext.newInstance();
+
+                                    String getKtvController_String = adapter.getString( "getKtvController" );
+                                    Object KtvController = XposedHelpers.callMethod( KaraokeContextObject, getKtvController_String );
+
+                                    String Auto_xiamai_Method_String = adapter.getString( "Auto_xiamai" );
+                                    XposedHelpers.callMethod( KtvController, Auto_xiamai_Method_String, true, false, true, true );
+                                    LogUtil.d( "karorkefz", KtvController.getClass().getName() );
+                                    LogUtil.d( "karorkefz", "点击下麦" );
+                                }
+                            }
+                        } );
             }
         }
     }
@@ -312,24 +502,25 @@ class Karaoke_Ktv_Hook extends RoomPasswordDialogViewAdd {
             String Robot_send_Method_String = adapter.getString( "Robot_send_Method" );
             Class Robot_send_Class = XposedHelpers.findClass( Robot_send_Class_String, classLoader );
             Object Robot_send_Object = XposedHelpers.newInstance( Robot_send_Class );
-            String KaraokeContext_Class_String = adapter.getString( "KaraokeContext_Class" );
-            String getRoomController_Method_String = adapter.getString( "getRoomController_Method" );
-            String getRoomController_data_Method_String = adapter.getString( "getRoomController_data_Method" );
-            Class KC = XposedHelpers.findClass( KaraokeContext_Class_String, classLoader );
-            Object KCObject = KC.newInstance();
-            Object getRoomController = XposedHelpers.callMethod( KCObject, getRoomController_Method_String );
-            Object b = XposedHelpers.callMethod( getRoomController, getRoomController_data_Method_String );
-            Gson bGson = new Gson();
-            String b_jsonString = bGson.toJson( b );
-            JSONObject b_JSONObject = new JSONObject( b_jsonString );
-            String strRoomId = b_JSONObject.getString( "strRoomId" );
-            String strShowId = b_JSONObject.getString( "strShowId" );
+
+//            String KaraokeContext_Class_String = adapter.getString( "KaraokeContext_Class" );
+//            String getRoomController_Method_String = adapter.getString( "getRoomController_Method" );
+//            String getRoomController_data_Method_String = adapter.getString( "getRoomController_data_Method" );
+//            Class KC = XposedHelpers.findClass( KaraokeContext_Class_String, classLoader );
+//            Object KCObject = KC.newInstance();
+//            Object getRoomController = XposedHelpers.callMethod( KCObject, getRoomController_Method_String );
+//            Object b = XposedHelpers.callMethod( getRoomController, getRoomController_data_Method_String );
+//            Gson bGson = new Gson();
+//            String b_jsonString = bGson.toJson( b );
+//            JSONObject b_JSONObject = new JSONObject( b_jsonString );
+//            String strRoomId = b_JSONObject.getString( "strRoomId" );
+//            String strShowId = b_JSONObject.getString( "strShowId" );
             final ArrayList five = new ArrayList();
             five.add( Long.valueOf( uid ) );
             String six = text;
             LogUtil.d( "karorkefz", "send:" + one );
             if (one != null) {
-                XposedHelpers.callMethod( Robot_send_Object, Robot_send_Method_String, one, strRoomId, strShowId, 1, five, six );
+                XposedHelpers.callMethod( Robot_send_Object, Robot_send_Method_String, one, strRoomId, strShowId, 2, five, six );
                 send( six );
             }
         } catch (Exception e) {
@@ -346,5 +537,32 @@ class Karaoke_Ktv_Hook extends RoomPasswordDialogViewAdd {
         } catch (Exception e) {
             LogUtil.w( "karorkefz", "歌房机器人自我发送信息出错:" + e.getMessage() );
         }
+    }
+
+    public void Song_inquiry() {
+        new Thread() {
+            @SuppressLint("ResourceType")
+            public void run() {
+                try {
+                    //构建歌曲对象
+                    Object two = XposedHelpers.callStaticMethod( XposedHelpers.findClass( "com.tencent.karaoke.module.vod.ui.ha", classLoader ), "a", SongList.get( list++ ) );
+                    if (list == SongList.size()) list = 0;
+                    LogUtil.d( "karorkefz", "list" + list );
+                    //向服务器发送歌曲对象
+                    XposedHelpers.callMethod( KtvDownloadObbDialog, "a", two, 2 );
+
+                    sleep( 1000 );
+
+                    XposedHelpers.callMethod( KtvDownloadObbDialog, "d" );
+                    XposedHelpers.callMethod( KtvDownloadObbDialog, "g" );
+                    //更改本地歌曲对象，并发起点歌
+                    XposedHelpers.setObjectField( Song_inquiry, "a", two );
+                    XposedHelpers.callMethod( Song_inquiry, "b" );
+                    LogUtil.d( "karorkefz", "调用自动点歌" );
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 }

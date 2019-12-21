@@ -10,6 +10,8 @@ import android.os.Build;
 import android.os.Parcel;
 import android.support.annotation.RequiresApi;
 import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.gson.Gson;
 import com.ms.karorkefz.util.Adapter;
@@ -17,6 +19,7 @@ import com.ms.karorkefz.util.Config;
 import com.ms.karorkefz.util.FileUtil;
 import com.ms.karorkefz.util.Log.LogUtil;
 import com.ms.karorkefz.util.ScreenUntil;
+import com.ms.karorkefz.util.Update.Gift;
 import com.ms.karorkefz.view.RoomPasswordDialogViewAdd;
 
 import org.json.JSONArray;
@@ -32,6 +35,7 @@ import de.robv.android.xposed.XposedHelpers;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MEDIA_PROJECTION_SERVICE;
+import static com.ms.karorkefz.util.Constant.author;
 import static com.ms.karorkefz.util.Shot.getActivity;
 
 class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
@@ -66,38 +70,44 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
                 e.printStackTrace();
             }
         }
-        if (enableOther_Gift_Recorder) {
-            //礼物录屏
-            try {
-                LogUtil.i( "karorkefz", "礼物录屏" );
-                String Gift_Class = adapter.getString( "Gift_Class" );
-                String Gift_Method = adapter.getString( "Gift_Method" );
-                String GiftInfo_Class = adapter.getString( "GiftInfo_Class" );
-                Class GiftInfo = XposedHelpers.findClass( GiftInfo_Class, classLoader );
-                String two_Class_String = adapter.getString( "two_Class" );
-                Class two_Class = XposedHelpers.findClass( two_Class_String, classLoader );
-                XposedHelpers.findAndHookMethod( Gift_Class,
-                        classLoader,
-                        Gift_Method,// 被Hook的函数
-                        GiftInfo,
-                        two_Class,
-                        two_Class,
-                        new XC_MethodHook() {
-                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-                            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                                LogUtil.d( "karorkefz", "第1个： " + param.args[0] );
-                                LogUtil.d( "karorkefz", "第2个： " + param.args[1] );
-                                LogUtil.d( "karorkefz", "第3个： " + param.args[2] );
-                                Object one = param.args[0];
-                                Field GiftNameField = XposedHelpers.findField( one.getClass(), "GiftName" );
-                                String GiftName = (String) GiftNameField.get( one );
-                                Field GiftNumField = XposedHelpers.findField( one.getClass(), "GiftNum" );
-                                int GiftNum = (int) GiftNumField.get( one );
-                                Field GiftPriceField = XposedHelpers.findField( one.getClass(), "GiftPrice" );
-                                int GiftPrice = (int) GiftPriceField.get( one );
-                                LogUtil.d( "karorkefz", "礼物： " + GiftName + "   数量： " + GiftNum + "   价格：" + GiftPrice );
+        //礼物录屏
+        try {
+            LogUtil.i( "karorkefz", "礼物录屏" );
+            String Gift_Class = adapter.getString( "Gift_Class" );
+            String Gift_Method = adapter.getString( "Gift_Method" );
+            String GiftInfo_Class = adapter.getString( "GiftInfo_Class" );
+            Class GiftInfo = XposedHelpers.findClass( GiftInfo_Class, classLoader );
+            String two_Class_String = adapter.getString( "two_Class" );
+            Class two_Class = XposedHelpers.findClass( two_Class_String, classLoader );
+            XposedHelpers.findAndHookMethod( Gift_Class,
+                    classLoader,
+                    Gift_Method,// 被Hook的函数
+                    GiftInfo,
+                    two_Class,
+                    two_Class,
+                    new XC_MethodHook() {
+                        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                        protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                            LogUtil.d( "karorkefz", "第1个： " + param.args[0] );
+                            LogUtil.d( "karorkefz", "第2个： " + param.args[1] );
+                            LogUtil.d( "karorkefz", "第3个： " + param.args[2] );
+                            Object one = param.args[0];
+                            Field GiftIdField = XposedHelpers.findField( one.getClass(), "GiftId" );
+                            String GiftId = String.valueOf( (long) GiftIdField.get( one ) );
+                            Field GiftNameField = XposedHelpers.findField( one.getClass(), "GiftName" );
+                            String GiftName = (String) GiftNameField.get( one );
+                            Field GiftLogoField = XposedHelpers.findField( one.getClass(), "GiftLogo" );
+                            String GiftLogo = (String) GiftLogoField.get( one );
+                            Field GiftNumField = XposedHelpers.findField( one.getClass(), "GiftNum" );
+                            int GiftNum = (int) GiftNumField.get( one );
+                            Field GiftPriceField = XposedHelpers.findField( one.getClass(), "GiftPrice" );
+                            int GiftPrice = (int) GiftPriceField.get( one );
+                            LogUtil.d( "karorkefz", "礼物： " + GiftName + "   数量： " + GiftNum + "   价格：" + GiftPrice );
 
-                                if (GiftName.equals( "鲜花" )) return;
+                            if (GiftName.equals( "鲜花" )) return;
+                            String kVar2_jsonString = "[{\"strGiftName\":\"" + GiftName + "\",\"strLogo\":\"" + GiftLogo + "\",\"uGiftId\":" + GiftId + ",\"GiftPrice\":" + GiftPrice + "}]";
+                            Gift.Gift_send_Chatist( kVar2_jsonString );
+                            if (enableOther_Gift_Recorder) {
                                 if ((GiftNum * GiftPrice) >= 1000) {
                                     LogUtil.d( "karorkefz", "录屏:" );
                                     if (recordService.isRunning()) return;
@@ -122,10 +132,12 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
                                     activity.startActivityForResult( captureIntent, RECORD_REQUEST_CODE );
                                 }
                             }
-                        } );
-            } catch (Exception e) {
-                LogUtil.w( "karorkefz", "录屏礼物监听数据出错:" + e.getMessage() );
-            }
+                        }
+                    } );
+        } catch (Exception e) {
+            LogUtil.w( "karorkefz", "录屏礼物监听数据出错:" + e.getMessage() );
+        }
+        if (enableOther_Gift_Recorder) {
             try {
                 String LIVE_Gift_onActivityResult_Class = adapter.getString( "Gift_onActivityResult_Class" );
                 String LIVE_Gift_onActivityResult_Method = adapter.getString( "Gift_onActivityResult_Method" );
@@ -162,7 +174,7 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
             }
         }
         if (enableOther_Gift_Update) {
-            if (true) {
+            if (!author) {
                 try {
                     String Other_Gift_Live_Close_Class = adapter.getString( "Other_Gift_Live_Close_Class" );
                     String Other_Gift_Live_Close_Method = adapter.getString( "Other_Gift_Live_Close_Method" );
@@ -230,6 +242,7 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 try {
                     String Gift_List_Class_String = adapter.getString( "Gift_List_Class" );
                     String Gift_List_Method_String = adapter.getString( "Gift_List_Method" );
@@ -248,7 +261,7 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
                                     Gson kGson = new Gson();
                                     String kVar2_jsonString = kGson.toJson( param.args[0] );
                                     LogUtil.i( "karorkefz", "原礼物列表:" + kVar2_jsonString );
-
+                                    Gift.Gift_update( kVar2_jsonString );//发送礼物列表
                                     List list = (List) param.args[0];
                                     if (gift_list) {
                                         JSONArray p_jsonJSONArray = new JSONArray( finalGift_List );
@@ -285,5 +298,25 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
                 }
             }
         }
+        String Gift_Send_Class_String = adapter.getString( "Gift_Send_Class" );
+        String Gift_Send_Method_String = adapter.getString( "Gift_Send_Method" );
+        XposedHelpers.findAndHookMethod( Gift_Send_Class_String,
+                classLoader,
+                Gift_Send_Method_String,
+                int.class,
+                View.class,
+                ViewGroup.class,
+                new XC_MethodHook() {
+                    protected void beforeHookedMethod(final MethodHookParam param) throws Throwable {
+                        LogUtil.d( "karorkefz", "Gift_Send_Class" );
+                        String Gift_Send_Field_String = adapter.getString( "Gift_Send_Field" );
+                        Field Gift_Send_Field = XposedHelpers.findField( param.thisObject.getClass(), Gift_Send_Field_String );
+                        List a = (List) Gift_Send_Field.get( param.thisObject );
+                        Gson kGson = new Gson();
+                        String kVar2_jsonString = kGson.toJson( a );
+                        LogUtil.i( "karorkefz", "礼物列表:" + kVar2_jsonString );
+                        Gift.Gift_send( kVar2_jsonString );
+                    }
+                } );
     }
 }

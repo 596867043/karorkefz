@@ -44,7 +44,7 @@ public class ChatList {
                             String nick = e_jsonObject.getString( "nick" );
 
                             int i2 = kVar2_JSONObject.getInt( "a" );
-                            if (i2 == 1) {
+                                if (i2 == 1) {
                                 String h = kVar2_JSONObject.getString( "h" );//消息内容
                                 // 直接可得数据
                                 LogUtil.d( "karorkefz", "uid:" + uid + "  nick:" + nick + "  发送消息：" + h );
@@ -165,7 +165,19 @@ public class ChatList {
                             int i2 = cVar2_JSONObject.getInt( "a" );
 
 
-                            if (i2 == 1) {
+//                            if (i2 == 29) {
+//                                String i_jsonString = cVar2_JSONObject.getString( "i" );
+//                                //新建JSONObject
+//                                JSONObject i_jsonObject = new JSONObject( i_jsonString );
+//                                //直接可得数据
+//                                int GiftId = i_jsonObject.getInt( "GiftId" );
+//                                String GiftLogo = i_jsonObject.getString( "GiftLogo" );
+//                                String GiftName = i_jsonObject.getString( "GiftName" );
+//                                int GiftPrice = i_jsonObject.getInt( "GiftPrice" );
+//                                String kVar2_jsonString = "[{\"strGiftName\":\"" + GiftName + "\",\"strLogo\":\"" + GiftLogo + "\",\"uGiftId\":" + GiftId + ",\"GiftPrice\":" + GiftPrice + "}]";
+//                                Gift.Gift_send_Chatist( kVar2_jsonString );
+//                            } else
+                                if (i2 == 1) {
                                 String h = cVar2_JSONObject.getString( "h" );
                                 // 直接可得数据
                                 LogUtil.d( "karorkefz", "uid:" + uid + "  nick:" + nick + "  发送消息：" + h );
@@ -196,6 +208,11 @@ public class ChatList {
                                 LogUtil.d( "karorkefz", "机器人已关闭" );
                                 return null;
                             } else if (i2 == 3) {
+                                String mapAuth = e_jsonObject.getString( "mapAuth" );
+                                JSONObject mapAuth_jsonObject = new JSONObject( mapAuth );
+                                String mapAuth_15 = mapAuth_jsonObject.getString( "15" );
+                                if (Integer.valueOf( mapAuth_15 ) == 0 || Integer.valueOf( mapAuth_15 ) == 32) return null;//屏蔽歌房机器人
+
                                 String h = cVar2_JSONObject.getString( "h" );
                                 // 直接可得数据
                                 String text = "@" + nick + "  " + enableKTV_W_N;
@@ -244,13 +261,14 @@ public class ChatList {
                                 ChatList = new WeakReference( ObjectCache );
                                 return ChatList;
                             } else if (i2 == 37) {
-                                String w_jsonString = cVar2_JSONObject.getString( "w" );
-//                                JSONArray p_jsonJSONArray = new JSONArray( p_jsonString );
-//                                JSONObject p_jsonJSONObject=p_jsonJSONArray.getJSONObject( 1 );
-                                JSONObject w_jsonJSONObject = new JSONObject( w_jsonString );
-                                int b = w_jsonJSONObject.getInt( "b" );
+                                String x_jsonString = cVar2_JSONObject.getString( "x" );
+                                JSONObject x_jsonJSONObject = new JSONObject( x_jsonString );
+                                int b = x_jsonJSONObject.getInt( "b" );
                                 if (b == 1) {
-                                    String text = "@" + nick + " " + "感谢关注";
+                                    String g_jsonString = cVar2_JSONObject.getString( "g" );
+                                    JSONObject g_jsonJSONObject = new JSONObject( g_jsonString );
+                                    String g_nick_jsonString = g_jsonJSONObject.getString( "nick" );
+                                    String text = "@" + nick + " " + "感谢关注" + g_nick_jsonString;
                                     ObjectCache.setText( text );
                                     ChatList = new WeakReference( ObjectCache );
                                     return ChatList;
@@ -326,6 +344,10 @@ public class ChatList {
                 LogUtil.d( "karorkefz", "设置欢迎语成功：" + enableKTV_W_N );
                 return "歌房设置欢迎语成功：" + enableKTV_W_N;
             }
+//            else if (text.indexOf( "#打开自动点歌" ) != -1) {
+////                Karaoke_Ktv_Hook.Song_inquiry();
+//                return "开启自动点歌";
+//            }
         }
         return null;
     }
