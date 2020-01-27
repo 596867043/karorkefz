@@ -4,30 +4,33 @@ import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
 
-import com.ms.karorkefz.util.Adapter;
 import com.ms.karorkefz.util.Config;
 import com.ms.karorkefz.util.Log.LogUtil;
 
-import org.json.JSONException;
-
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
-import static com.ms.karorkefz.util.Constant.open;
-
 public class KaraokeHook {
-    boolean enableStart, enableFansDelete, enableKTV, enableLIVE, enableRecording, enableOther;
-    Config config;
-    Adapter adapter;
-    String View_Class;
+    static Context context;
 
-    public KaraokeHook(){
-        try {
-            adapter = new Adapter( "Setting" );
-            View_Class = adapter.getString( "View_Class" );
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public static void Load() {
+        if (context == null) return;
+        LogUtil.v( "karorkefz", "进入Karorke,加载Load." );
+        Config config = new Config( context );
+        if (config.isOn( "enableStart" )) {
+            new Karaoke_MainTab_Hook( context ).init();
+        }
+        if (config.isOn( "enableKTV" )) {
+            new Karaoke_Ktv_Hook( context ).init();
+        }
+        if (config.isOn( "enableLIVE" )) {
+            new Karaoke_Live_Hook( context ).init();
+        }
+        if (config.isOn( "enableRecording" )) {
+            new Karaoke_RecordingActivity_Hook( context ).init();
+        }
+        if (config.isOn( "enableOther" )) {
+            new Karaoke_Other_Hook( context ).init();//其他功能
         }
     }
 
@@ -35,63 +38,94 @@ public class KaraokeHook {
         LogUtil.v( "karorkefz", "进入Karorke" );
         XposedHelpers.findAndHookMethod( Instrumentation.class, "callApplicationOnCreate", Application.class, new XC_MethodHook() {
             private boolean mCalled = false;
-
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                context = (Context) param.args[0];
                 if (mCalled == false) {
                     mCalled = true;
-                    Context context = (Context) param.args[0];
-                    config = new Config( context );
-                    enableStart = config.isOn( "enableStart" );
-                    enableFansDelete = config.isOn( "enableFansDelete" );
-                    enableKTV = config.isOn( "enableKTV" );
-                    enableLIVE = config.isOn( "enableLIVE" );
-                    enableRecording = config.isOn( "enableRecording" );
-                    enableOther = config.isOn( "enableOther" );
+                    context = (Context) param.args[0];
+                    new Karaoke_Setting_Hook( context.getClassLoader() ).init();
+                    new Karaoke_Load_Hook( context.getClassLoader() ).init();
                 }
+//                if (!open) {
+//                    Context finalContext = context;
+//                    new Thread() {
+//                        public void run() {
+//                            int i = 0;
+//                            while (true) {
+//                                try {
+//                                    if (open) {
+//                                        Config config = new Config( finalContext );
+//                                        if (config.isOn( "enableStart" )) {
+//                                            new Karaoke_MainTab_Hook( finalContext ).init();
+//                                        }
+//                                        if (config.isOn( "enableKTV" )) {
+//                                            new Karaoke_Ktv_Hook( finalContext ).init();
+//                                        }
+//                                        if (config.isOn( "enableLIVE" )) {
+//                                            new Karaoke_Live_Hook( finalContext ).init();
+//                                        }
+//                                        if (config.isOn( "enableRecording" )) {
+//                                            new Karaoke_RecordingActivity_Hook( finalContext ).init();
+//                                        }
+//                                        if (config.isOn( "enableOther" )) {
+//                                            new Karaoke_Other_Hook( finalContext ).init();//其他功能
+//                                        }
+//                                        break;
+//                                    }
+//                                    sleep( 1000 );
+//                                } catch (InterruptedException e) {
+//                                    LogUtil.e( "karorkefz", "异常:" + e.getMessage() );
+//                                }
+//                                if (i == 10) break;
+//                                i++;
+//                            }
+//                        }
+//                    }.start();
+//                }
             }
         } );
-        XposedBridge.hookAllMethods( ClassLoader.class, "loadClass", new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                if (param.hasThrowable()) return;
-                if (param.args.length != 1) return;
-                Class<?> cls = (Class<?>) param.getResult();
-                String name = cls.getName();
-                if (name.equals( View_Class )) {
-                    LogUtil.v( "karorkefz", "Karorke-准备加载 设置" );
-                    new Karaoke_Setting_Hook( cls.getClassLoader() ).init();
-                }
-                if (enableStart && name.equals( "com.tencent.karaoke.module.splash.ui.SplashBaseActivity" )) {
-                    enableStart = false;
-                    LogUtil.v( "karorkefz", "Karorke-准备加载maintab" );
-                    new Karaoke_MainTab_Hook( cls.getClassLoader() ).init();
-                }
-                if (enableFansDelete && name.equals( "com.tencent.karaoke.module.user.ui.FollowFansActivity" )) {
-                    enableFansDelete = false;
-                    LogUtil.v( "karorkefz", "Karorke-准备加载 user" );
-                    new Karaoke_User_Hook( cls.getClassLoader() ).init();
-                }
-                if (enableKTV && name.equals( "com.tencent.karaoke.module.ktv.ui.KtvRoomActivity" )) {
-                    enableKTV = false;
-                    LogUtil.v( "karorkefz", "Karorke-准备加载单麦Ktv" );
-                    new Karaoke_Ktv_Hook( cls.getClassLoader(), config ).init();
-                }
-                if (enableLIVE && name.equals( "com.tencent.karaoke.module.live.ui.LiveActivity" )) {
-                    enableLIVE = false;
-                    LogUtil.v( "karorkefz", "Karorke-准备加载Live" );
-                    new Karaoke_Live_Hook( cls.getClassLoader(), config ).init();
-                }
-                if (enableRecording && name.equals( "com.tencent.karaoke.module.recording.ui.main.RecordingActivity" )) {
-                    enableRecording = false;
-                    LogUtil.v( "karorkefz", "Karorke-准备加载 歌曲录制" );
-                    new Karaoke_RecordingActivity_Hook( cls.getClassLoader() ).init();
-                }
-                if (enableOther && name.equals( "com.tencent.karaoke.module.splash.ui.SplashBaseActivity" )) {
-                    enableOther = false;
-                    new Karaoke_Other_Hook( cls.getClassLoader(), config ).init();//其他功能
-                    new Karaoke_ceshi_Hook( cls.getClassLoader(), config ).init();//其他功能
-                }
-            }
-        } );
+//        XposedBridge.hookAllMethods( ClassLoader.class, "loadClass", new XC_MethodHook() {
+//            @Override
+//            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//                if (param.hasThrowable()) return;
+//                if (param.args.length != 1) return;
+//                Class<?> cls = (Class<?>) param.getResult();
+//                String name = cls.getName();
+////                LogUtil.e( "karorkefz", "class:"+name );
+//                if ( name.equals( "com.tencent.karaoke.module.splash.ui.SplashBaseActivity")) {
+//                        LogUtil.v( "karorkefz", "Karorke-准备加载用户权限" );
+//                        new Karaoke_Load_Hook( cls.getClassLoader() ).init();
+//                    }
+//                if (name.equals( View_Class )) {
+//                    LogUtil.v( "karorkefz", "Karorke-准备加载 设置" );
+//                    new Karaoke_Setting_Hook( cls.getClassLoader() ).init();
+//                }
+//                if(!open)return;
+//                if (enableStart && name.equals( "com.tencent.karaoke.module.splash.ui.SplashBaseActivity" )) {
+//                    enableStart = false;
+//                    LogUtil.v( "karorkefz", "Karorke-准备加载maintab" );
+//                    new Karaoke_MainTab_Hook( cls.getClassLoader() ).init();
+//                }
+//                if (enableKTV && name.equals( "com.tencent.karaoke.module.ktv.ui.KtvRoomActivity" )) {
+//                    enableKTV = false;
+//                    LogUtil.v( "karorkefz", "Karorke-准备加载单麦Ktv" );
+//                    new Karaoke_Ktv_Hook( cls.getClassLoader(), config ).init();
+//                }
+//                if (enableLIVE && name.equals( "com.tencent.karaoke.module.live.ui.LiveActivity" )) {
+//                    enableLIVE = false;
+//                    LogUtil.v( "karorkefz", "Karorke-准备加载Live" );
+//                    new Karaoke_Live_Hook( cls.getClassLoader(), config ).init();
+//                }
+//                if (enableRecording && name.equals( "com.tencent.karaoke.module.recording.ui.main.RecordingActivity" )) {
+//                    enableRecording = false;
+//                    LogUtil.v( "karorkefz", "Karorke-准备加载 歌曲录制" );
+//                    new Karaoke_RecordingActivity_Hook( cls.getClassLoader() ).init();
+//                }
+//                if (enableOther) {
+//                    enableOther = false;
+//                    new Karaoke_Other_Hook( cls.getClassLoader(), config ).init();//其他功能
+//                }
+//            }
+//        } );
     }
 }

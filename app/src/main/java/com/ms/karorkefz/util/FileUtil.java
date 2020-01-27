@@ -16,7 +16,7 @@ public class FileUtil {
     //adapter
     // write SDCard
     public static void writeFileSdcardFile(String fileName, String writeStr) throws IOException {
-        DeleteFolder();
+        DeleteFolder( Environment.getExternalStorageDirectory().getAbsolutePath() + "/moshou");
         try {
             Log.i( "karorkefz", "调用写文件" );
             File file = new File( FILE_PATH, fileName );
@@ -35,7 +35,7 @@ public class FileUtil {
         }
     }
     public static void writeFile(String fileName, String writeStr) throws IOException {
-        DeleteFolder();
+        DeleteFolder( Environment.getExternalStorageDirectory().getAbsolutePath() + "/moshou");
         try {
             Log.i( "karorkefz", "调用写文件" );
             File file = new File( FILE_PATH, fileName );
@@ -56,7 +56,7 @@ public class FileUtil {
 
     //    read SDCard
     public static String readFileSdcardFile(String fileName) throws IOException {
-        DeleteFolder();
+        DeleteFolder( Environment.getExternalStorageDirectory().getAbsolutePath() + "/moshou");
         String res = "";
         try {
             Log.i( "karorkefz", "调用读文件" );
@@ -138,8 +138,7 @@ public class FileUtil {
         return dirFile.delete();
     }
 
-    public static boolean DeleteFolder() {
-        String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/moshou";
+    public static boolean DeleteFolder(String filePath) {
         File file = new File( filePath );
         if (!file.exists()) {
             return false;

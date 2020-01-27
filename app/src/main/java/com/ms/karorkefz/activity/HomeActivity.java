@@ -6,10 +6,12 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +23,8 @@ import com.ms.karorkefz.BuildConfig;
 import com.ms.karorkefz.R;
 import com.ms.karorkefz.adapter.PreferenceAdapter;
 import com.ms.karorkefz.util.Constant;
-import com.ms.karorkefz.util.Update.Adapter;
+import com.ms.karorkefz.util.NDKTools;
+import com.ms.karorkefz.util.NetWork.Adapter;
 import com.ms.karorkefz.xposed.HookStatue;
 
 import org.json.JSONException;
@@ -63,6 +66,31 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
         } catch (JSONException e) {
             e.printStackTrace();
         }
+//        try {
+//            String dir = getPackageManager().getApplicationInfo( "com.ms.karorkefz", 0 ).nativeLibraryDir;
+//            Log.e( "karorkefz", "地址:" + dir );
+//            NDKTools.NDKTools_LibraryDir( dir );
+//            new Thread() {
+//                public void run() {
+//                    try {
+//                        String text = NDKTools.getStringFromNDK();
+//                        String text1 = NDKTools.setStringFromNDK( "{\"syslog_db\":\"构建成功\"}" );
+////                    String text2 = NDKTools.NetWorkFromNDK();
+//
+//                        int sum = NDKTools.sumFromNDK( 1, 2 );
+//                        Log.i( "karorkefz", "native,text=" + text );
+//                        Log.i( "karorkefz", "native,text1=" + text1 );
+////                    Log.i( "karorkefz", "native,text2=" + String.valueOf( text2 ) );
+//                        Log.i( "karorkefz", "native,text=" + text + ",sum:" + sum );
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }.start();
+//        } catch (PackageManager.NameNotFoundException e) {
+//            Log.e( "karorkefz", "获取地址失败。" );
+//            e.printStackTrace();
+//        }
     }
 
     private void CheckPoster() {
@@ -86,7 +114,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         PreferenceAdapter.Data data = mListAdapter.getItem( i );
-        if (data == null || TextUtils.isEmpty( data.title ) ) {
+        if (data == null || TextUtils.isEmpty( data.title )) {
             return;
         } else if ("状态".equals( data.title )) {
             if ("模块未激活".equals( data.subTitle )) {
@@ -101,7 +129,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
             intent.setAction( "android.intent.action.VIEW" );
             intent.setData( Uri.parse( url ) );
             HomeActivity.this.startActivity( intent );
-        } else if(! TextUtils.isEmpty( data.url )){
+        } else if (!TextUtils.isEmpty( data.url )) {
             WebActivity.openUrl( this, url + data.url );
         }
     }

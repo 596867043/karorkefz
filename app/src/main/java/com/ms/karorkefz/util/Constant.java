@@ -6,14 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Constant {
-    public static boolean open = true;
     public static final boolean author = true;
-    public static final String url = "http://60.205.227.119/karorkefz/";
-    public static final String ip = "http://60.205.227.119/";
+    public static final String url = "http://www.moshou.tech/karorkefz/";
+    public static final String ip = "http://www.moshou.tech/";
     public static final String FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/moshou";
-
     public static final List Setting_list = Setting_ArrayList();
-    public static  int uid = 0;
+    public static boolean open = false;
+    public static int code = 0;
+    public static String msg = "暂未通过网络校验，请点击更新状态信息。";
+    public static  Adapter adapter = null;
+    public static int uid = 0;
+
     static ArrayList Setting_ArrayList() {
         ArrayList<Object> list = new ArrayList<>();
         list.add( new Setting( "启动页广告关闭", "启动页广告关闭", "enableStart", "Introduction" ) );

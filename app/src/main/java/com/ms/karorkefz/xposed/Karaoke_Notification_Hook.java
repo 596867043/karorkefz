@@ -11,9 +11,8 @@ import android.support.annotation.Keep;
 
 import com.ms.karorkefz.util.Adapter;
 import com.ms.karorkefz.util.Base.BasicViewNotification;
+import com.ms.karorkefz.util.Constant;
 import com.ms.karorkefz.util.Log.LogUtil;
-
-import org.json.JSONException;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -23,28 +22,26 @@ import de.robv.android.xposed.XposedHelpers;
 public class Karaoke_Notification_Hook extends BasicViewNotification {
 
     private static MediaSession.Token mTOKEN;
-    Adapter adapter;
 
-    Karaoke_Notification_Hook(ClassLoader mclassLoader) throws JSONException {
+    Karaoke_Notification_Hook(ClassLoader mclassLoader)  {
         classLoader = mclassLoader;
-        this.adapter = new Adapter( "Notification" );
     }
 
     @Override
     public void init() {
         LogUtil.d( "karorkefz", "进入Karaoke_Notification_Hook" );
-        String Notification__Class = adapter.getString( "Notification__Class" );
-        String Notification_Method = adapter.getString( "Notification_Method" );
-        titleID = Integer.parseInt( adapter.getString( "titleID" ), 16 );
-        textID = Integer.parseInt( adapter.getString( "textID" ), 16 );
-        bitmapID = Integer.parseInt( adapter.getString( "bitmapID" ), 16 );
-        iconID = Integer.parseInt( adapter.getString( "iconID" ), 16 );
-        String PlaySongInfo__Class = adapter.getString( "PlaySongInfo__Class" );
+        String Notification__Class = Constant.adapter.getString( "Notification__Class" );
+        String Notification_Method = Constant.adapter.getString( "Notification_Method" );
+        titleID = Integer.parseInt( Constant.adapter.getString( "Notification_titleID" ), 16 );
+        textID = Integer.parseInt( Constant.adapter.getString( "Notification_textID" ), 16 );
+        bitmapID = Integer.parseInt( Constant.adapter.getString( "Notification_bitmapID" ), 16 );
+        iconID = Integer.parseInt( Constant.adapter.getString( "Notification_iconID" ), 16 );
+        String PlaySongInfo__Class = Constant.adapter.getString( "Notification_PlaySongInfo__Class" );
         Class playInfoClazz = XposedHelpers.findClass( PlaySongInfo__Class, classLoader );
-        String Intent_Class = adapter.getString( "Intent_Class" );
-        String preSongIntent_Field = adapter.getString( "preSongIntent_Field" );
-        String playIntent_Field = adapter.getString( "playIntent_Field" );
-        String nextSongIntent_Field = adapter.getString( "nextSongIntent_Field" );
+        String Intent_Class = Constant.adapter.getString( "Notification_Intent_Class" );
+        String preSongIntent_Field = Constant.adapter.getString( "Notification_preSongIntent_Field" );
+        String playIntent_Field = Constant.adapter.getString( "Notification_playIntent_Field" );
+        String nextSongIntent_Field = Constant.adapter.getString( "Notification_nextSongIntent_Field" );
         XposedHelpers.findAndHookMethod( Notification__Class, classLoader, Notification_Method, Context.class, playInfoClazz, int.class, String.class, Drawable.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {

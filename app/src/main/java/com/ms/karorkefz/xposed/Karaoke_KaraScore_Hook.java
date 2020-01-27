@@ -2,9 +2,8 @@ package com.ms.karorkefz.xposed;
 
 import com.google.gson.Gson;
 import com.ms.karorkefz.util.Adapter;
+import com.ms.karorkefz.util.Constant;
 import com.ms.karorkefz.util.Log.LogUtil;
-
-import org.json.JSONException;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -12,24 +11,22 @@ import de.robv.android.xposed.XposedHelpers;
 public class Karaoke_KaraScore_Hook {
     int i;
     private ClassLoader classLoader;
-    Adapter adapter;
 
-    Karaoke_KaraScore_Hook(ClassLoader mclassLoader) throws JSONException {
+    Karaoke_KaraScore_Hook(ClassLoader mclassLoader){
         classLoader = mclassLoader;
-        this.adapter = new Adapter( "KaraScore" );
     }
 
     public void init() {
         LogUtil.d( "karorkefz", "KaraScore" );
-        String KaraScore_Class_String ="com.tencent.karaoke.audiobasesdk.KaraScore";
+        String KaraScore_Class_String = "com.tencent.karaoke.audiobasesdk.KaraScore";
         String getAllScore_Method_String = "getAllScore";
         String getLastScore_Method_String = "getLastScore";
         String getTotalScore_Method_String = "getTotalScore";
         try {
-             KaraScore_Class_String = adapter.getString( "KaraScore_Class" );
-             getAllScore_Method_String = adapter.getString( "getAllScore_Method" );
-             getLastScore_Method_String = adapter.getString( "getLastScore_Method" );
-             getTotalScore_Method_String = adapter.getString( "getTotalScore_Method" );
+            KaraScore_Class_String = Constant.adapter.getString( "KaraScore_Class" );
+            getAllScore_Method_String = Constant.adapter.getString( "KaraScore_getAllScore_Method" );
+            getLastScore_Method_String = Constant.adapter.getString( "KaraScore_getLastScore_Method" );
+            getTotalScore_Method_String = Constant.adapter.getString( "KaraScore_getTotalScore_Method" );
         } catch (Exception e) {
             LogUtil.w( "karorkefz", "sss评分修改出错:" + e.getMessage() );
         }

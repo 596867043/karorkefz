@@ -1,57 +1,32 @@
 package com.ms.karorkefz.util;
 
-import android.util.Log;
+import com.ms.karorkefz.util.Log.LogUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 public class Adapter {
-    JSONObject adapterJsonObject;
+    JSONObject adapter;
 
-    public Adapter(String name) throws JSONException {
+    public Adapter(JSONObject adapter) {
+        this.adapter = adapter;
+    }
+
+    public Adapter(String name) {
         try {
             String adapterString = FileUtil.readFileSdcardFile( "/adapter.json" );
-            JSONObject jsonObject = new JSONObject( adapterString );
-            String dataString = jsonObject.getString( "data" );
-            JSONObject dataObject = new JSONObject( dataString );
-            String jsonString = dataObject.getString( name );
-            this.adapterJsonObject = new JSONObject( jsonString );
-
+            this.adapter =new JSONObject( adapterString ).getJSONObject( "data" ).getJSONObject( name );;
         } catch (Exception e) {
-            String adapterString = "{\"version\": \"6.8.1.273\",\"data\": {\"adapter\": {\"version\": \"false\"},\"Setting\": {},\"Notification\": {},\"KaraScore\": {},\"Ktv\": {},\"Live\": {},\"User\": {},\"Other\": {}}}";
-            JSONObject jsonObject = new JSONObject( adapterString );
-            String dataString = jsonObject.getString( "data" );
-            JSONObject dataObject = new JSONObject( dataString );
-            String jsonString = dataObject.getString( name );
-            this.adapterJsonObject = new JSONObject( jsonString );
+            LogUtil.i( "karorkefz", "Load适配出错:" + e.getMessage() );
         }
     }
-
-    public JSONObject getObject(JSONArray jsonArray, int i) throws JSONException {
-        JSONObject adapterJsonObject = jsonArray.getJSONObject( i );
-        return adapterJsonObject;
-    }
-
-    public Adapter getObject(String string) throws JSONException, IOException {
-        Adapter adapterJsonObject = new Adapter( string );
-        return adapterJsonObject;
-    }
-
-    public String getString(JSONObject jsonbject, String name) throws JSONException {
-        String JsonString = jsonbject.getString( name );
-        return JsonString;
-    }
-
     public String getString(String name) {
         try {
-            String JsonString = this.adapterJsonObject.getString( name );
+            String JsonString = this.adapter.getString( name );
             return JsonString;
         } catch (Exception e) {
             return null;
         }
     }
-
 }

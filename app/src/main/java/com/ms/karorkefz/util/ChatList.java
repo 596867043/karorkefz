@@ -44,6 +44,18 @@ public class ChatList {
                             String nick = e_jsonObject.getString( "nick" );
 
                             int i2 = kVar2_JSONObject.getInt( "a" );
+//                            if (i2 == 2) {
+//                                String i_jsonString = kVar2_JSONObject.getString( "i" );
+//                                //新建JSONObject
+//                                JSONObject i_jsonObject = new JSONObject( i_jsonString );
+//                                //直接可得数据
+//                                int GiftId = i_jsonObject.getInt( "GiftId" );
+//                                String GiftLogo = i_jsonObject.getString( "GiftLogo" );
+//                                String GiftName = i_jsonObject.getString( "GiftName" );
+//                                int GiftPrice = i_jsonObject.getInt( "GiftPrice" );
+//                                String GiftList_jsonString = "[{\"strGiftName\":\"" + GiftName + "\",\"strLogo\":\"" + GiftLogo + "\",\"uGiftId\":" + GiftId + ",\"GiftPrice\":" + GiftPrice + "}]";
+//                                Gift.Gift_send_Chatist( GiftList_jsonString );
+//                            } else
                                 if (i2 == 1) {
                                 String h = kVar2_JSONObject.getString( "h" );//消息内容
                                 // 直接可得数据
@@ -62,7 +74,7 @@ public class ChatList {
                                             return null;
                                         }
                                         if (uid == myUid) {
-                                            ObjectCache.setText( "机器人消息：" + " " + text );
+                                            ObjectCache.setText( text );
                                         } else {
                                             ObjectCache.setText( "@" + nick + " " + text );
                                         }
@@ -164,7 +176,7 @@ public class ChatList {
 
                             int i2 = cVar2_JSONObject.getInt( "a" );
 
-
+//
 //                            if (i2 == 29) {
 //                                String i_jsonString = cVar2_JSONObject.getString( "i" );
 //                                //新建JSONObject
@@ -194,7 +206,7 @@ public class ChatList {
                                             return null;
                                         }
                                         if (uid == myUid) {
-                                            ObjectCache.setText( "机器人消息：" + " " + text );
+                                            ObjectCache.setText( text );
                                         } else {
                                             ObjectCache.setText( "@" + nick + " " + text );
                                         }
@@ -211,7 +223,8 @@ public class ChatList {
                                 String mapAuth = e_jsonObject.getString( "mapAuth" );
                                 JSONObject mapAuth_jsonObject = new JSONObject( mapAuth );
                                 String mapAuth_15 = mapAuth_jsonObject.getString( "15" );
-                                if (Integer.valueOf( mapAuth_15 ) == 0 || Integer.valueOf( mapAuth_15 ) == 32) return null;//屏蔽歌房机器人
+                                if (Integer.valueOf( mapAuth_15 ) == 0 || Integer.valueOf( mapAuth_15 ) == 32)
+                                    return null;//屏蔽歌房机器人
 
                                 String h = cVar2_JSONObject.getString( "h" );
                                 // 直接可得数据

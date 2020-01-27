@@ -7,9 +7,12 @@ android {
         minSdkVersion 21
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 21
-        versionCode 11
-        versionName "2.1"
+        versionCode 14
+        versionName "2.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters  "armeabi-v7a", "x86"
+        }
     }
     buildTypes {
         release {
@@ -21,6 +24,11 @@ android {
     compileOptions {//source版本
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
+    }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
     }
     applicationVariants.all { variant ->
         variant.outputs.all { output ->// each 改为 all

@@ -3,8 +3,6 @@ package com.ms.karorkefz.util.Log;
 import android.os.Environment;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
@@ -33,6 +31,7 @@ public class LogUtil {
             int Log_Level = Integer.parseInt( xSharedPreferences.getString( "Log_Level", "0" ) );
             LOG_LEVEL = Log_Level;
             logFileEnable = Log;
+
             String logFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/moshou/Log/Hook.txt";
             File file = new File( logFilePath );
             try {
@@ -170,7 +169,7 @@ public class LogUtil {
         }
     }
 
-    private String getPrefixName() {
+    public String getPrefixName() {
         StackTraceElement[] sts = Thread.currentThread().getStackTrace();
         if (sts == null || sts.length == 0) {
             return "[ minify ]";

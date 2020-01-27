@@ -14,16 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.Gson;
-import com.ms.karorkefz.util.Adapter;
 import com.ms.karorkefz.util.Config;
+import com.ms.karorkefz.util.Constant;
 import com.ms.karorkefz.util.FileUtil;
 import com.ms.karorkefz.util.Log.LogUtil;
+import com.ms.karorkefz.util.NetWork.Gift;
 import com.ms.karorkefz.util.ScreenUntil;
-import com.ms.karorkefz.util.Update.Gift;
-import com.ms.karorkefz.view.RoomPasswordDialogViewAdd;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -35,12 +33,11 @@ import de.robv.android.xposed.XposedHelpers;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MEDIA_PROJECTION_SERVICE;
-import static com.ms.karorkefz.util.Constant.author;
+import static com.ms.karorkefz.util.Constant.FILE_PATH;
 import static com.ms.karorkefz.util.Shot.getActivity;
 
-class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
+class Karaoke_Other_Hook {
     Config config;
-    Adapter adapter;
     boolean enableOther_Notification, enableOther_Gift_Recorder, enableOther_Gift_Update;
     private ClassLoader classLoader;
     private static int RECORD_REQUEST_CODE = 5;
@@ -50,34 +47,27 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
     Activity activity;
     private boolean gift_list = true;
 
-    Karaoke_Other_Hook(ClassLoader mclassLoader, Config config) throws JSONException {
-
-        classLoader = mclassLoader;
-        this.config = config;
-        this.adapter = new Adapter( "Other" );
+    Karaoke_Other_Hook(Context context) {
+        classLoader = context.getClassLoader();
+        this.config = new Config( context );
         enableOther_Notification = config.isOn( "enableOther_Notification" );
         enableOther_Gift_Recorder = config.isOn( "enableOther_Gift_Recorder" );
         enableOther_Gift_Update = config.isOn( "enableOther_Gift_Update" );
-
     }
 
     public void init() {
         LogUtil.d( "karorkefz", "进入Other" );
         if (enableOther_Notification) {
-            try {
-                new Karaoke_Notification_Hook( classLoader ).init();//通知栏
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            new Karaoke_Notification_Hook( classLoader ).init();//通知栏
         }
         //礼物录屏
         try {
             LogUtil.i( "karorkefz", "礼物录屏" );
-            String Gift_Class = adapter.getString( "Gift_Class" );
-            String Gift_Method = adapter.getString( "Gift_Method" );
-            String GiftInfo_Class = adapter.getString( "GiftInfo_Class" );
+            String Gift_Class = Constant.adapter.getString( "Other_Gift_Class" );
+            String Gift_Method = Constant.adapter.getString( "Other_Gift_Method" );
+            String GiftInfo_Class = Constant.adapter.getString( "Other_GiftInfo_Class" );
             Class GiftInfo = XposedHelpers.findClass( GiftInfo_Class, classLoader );
-            String two_Class_String = adapter.getString( "two_Class" );
+            String two_Class_String = Constant.adapter.getString( "Other_two_Class" );
             Class two_Class = XposedHelpers.findClass( two_Class_String, classLoader );
             XposedHelpers.findAndHookMethod( Gift_Class,
                     classLoader,
@@ -139,8 +129,8 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
         }
         if (enableOther_Gift_Recorder) {
             try {
-                String LIVE_Gift_onActivityResult_Class = adapter.getString( "Gift_onActivityResult_Class" );
-                String LIVE_Gift_onActivityResult_Method = adapter.getString( "Gift_onActivityResult_Method" );
+                String LIVE_Gift_onActivityResult_Class = Constant.adapter.getString( "Other_Gift_onActivityResult_Class" );
+                String LIVE_Gift_onActivityResult_Method = Constant.adapter.getString( "Other_Gift_onActivityResult_Method" );
                 XposedHelpers.findAndHookMethod( LIVE_Gift_onActivityResult_Class,
                         classLoader,
                         LIVE_Gift_onActivityResult_Method,// 被Hook的函数
@@ -174,10 +164,10 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
             }
         }
         if (enableOther_Gift_Update) {
-            if (!author) {
+            if (!Constant.author) {
                 try {
-                    String Other_Gift_Live_Close_Class = adapter.getString( "Other_Gift_Live_Close_Class" );
-                    String Other_Gift_Live_Close_Method = adapter.getString( "Other_Gift_Live_Close_Method" );
+                    String Other_Gift_Live_Close_Class = Constant.adapter.getString( "Other_Gift_Live_Close_Class" );
+                    String Other_Gift_Live_Close_Method = Constant.adapter.getString( "Other_Gift_Live_Close_Method" );
                     XposedHelpers.findAndHookMethod( Other_Gift_Live_Close_Class,
                             classLoader,
                             Other_Gift_Live_Close_Method,// 被Hook的函数
@@ -186,7 +176,7 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
                                 protected void beforeHookedMethod(final MethodHookParam param) throws Throwable {
                                     LogUtil.e( "karorkefz", "直播间抽奖监听q.e，返回:" + param.args[0].getClass().getName() );
                                     if (gift_list) {
-                                        String Other_Gift_Live_Close_String = adapter.getString( "Other_Gift_Live_Close_String" );
+                                        String Other_Gift_Live_Close_String = Constant.adapter.getString( "Other_Gift_Live_Close_String" );
                                         if (param.args[0].getClass().getName().equals( Other_Gift_Live_Close_String )) {
                                             gift_list = false;
                                             new AlertDialog.Builder( (Context) param.args[0] )
@@ -205,8 +195,8 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
                     LogUtil.w( "karorkefz", "礼物列表修改，直播间监听出错:" + e.getMessage() );
                 }
                 try {
-                    String Other_Gift_Ktv_Close_Class = adapter.getString( "Other_Gift_Ktv_Close_Class" );
-                    String Other_Gift_Ktv_Close_Method = adapter.getString( "Other_Gift_Ktv_Close_Method" );
+                    String Other_Gift_Ktv_Close_Class = Constant.adapter.getString( "Other_Gift_Ktv_Close_Class" );
+                    String Other_Gift_Ktv_Close_Method = Constant.adapter.getString( "Other_Gift_Ktv_Close_Method" );
                     XposedHelpers.findAndHookMethod( Other_Gift_Ktv_Close_Class,
                             classLoader,
                             Other_Gift_Ktv_Close_Method,// 被Hook的函数
@@ -236,17 +226,22 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
             //礼物列表
             if (gift_list) {
                 String Gift_List_json = null;
-                String Gift_List = adapter.getString( "Gift_List" );
-                try {
-                    Gift_List_json = FileUtil.readFileSdcardFile( "/list.json" );
-                } catch (IOException e) {
-                    e.printStackTrace();
+                String Gift_List = Constant.adapter.getString( "Other_Gift_List" );
+                if (Constant.author) {
+                    try {
+                        Gift_List_json = FileUtil.readFileSdcardFile( "/list.json" );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    if (FileUtil.DeleteFolder( FILE_PATH + "/list.json" ))
+                        FileUtil.DeleteFolder( FILE_PATH );
                 }
 
                 try {
-                    String Gift_List_Class_String = adapter.getString( "Gift_List_Class" );
-                    String Gift_List_Method_String = adapter.getString( "Gift_List_Method" );
-                    String Gift_Data_Class_String = adapter.getString( "Gift_Data_Class" );
+                    String Gift_List_Class_String = Constant.adapter.getString( "Other_Gift_List_Class" );
+                    String Gift_List_Method_String = Constant.adapter.getString( "Other__Gift_List_Method" );
+                    String Gift_Data_Class_String = Constant.adapter.getString( "Other_Gift_Data_Class" );
                     Class<?> GiftData = XposedHelpers.findClass( Gift_Data_Class_String, classLoader );
                     if (Gift_List_json != null) {
                         Gift_List = Gift_List_json;
@@ -298,25 +293,5 @@ class Karaoke_Other_Hook extends RoomPasswordDialogViewAdd {
                 }
             }
         }
-        String Gift_Send_Class_String = adapter.getString( "Gift_Send_Class" );
-        String Gift_Send_Method_String = adapter.getString( "Gift_Send_Method" );
-        XposedHelpers.findAndHookMethod( Gift_Send_Class_String,
-                classLoader,
-                Gift_Send_Method_String,
-                int.class,
-                View.class,
-                ViewGroup.class,
-                new XC_MethodHook() {
-                    protected void beforeHookedMethod(final MethodHookParam param) throws Throwable {
-                        LogUtil.d( "karorkefz", "Gift_Send_Class" );
-                        String Gift_Send_Field_String = adapter.getString( "Gift_Send_Field" );
-                        Field Gift_Send_Field = XposedHelpers.findField( param.thisObject.getClass(), Gift_Send_Field_String );
-                        List a = (List) Gift_Send_Field.get( param.thisObject );
-                        Gson kGson = new Gson();
-                        String kVar2_jsonString = kGson.toJson( a );
-                        LogUtil.i( "karorkefz", "礼物列表:" + kVar2_jsonString );
-                        Gift.Gift_send( kVar2_jsonString );
-                    }
-                } );
     }
 }

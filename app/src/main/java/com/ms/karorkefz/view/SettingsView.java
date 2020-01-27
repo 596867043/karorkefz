@@ -19,12 +19,15 @@ import com.ms.karorkefz.util.Config;
 import com.ms.karorkefz.util.Constant;
 import com.ms.karorkefz.util.DpUtil;
 import com.ms.karorkefz.util.Log.LogUtil;
+import com.ms.karorkefz.util.NetWork.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.graphics.PixelFormat.TRANSPARENT;
 import static com.ms.karorkefz.util.Constant.Setting_list;
+import static com.ms.karorkefz.util.Constant.msg;
+import static com.ms.karorkefz.util.Constant.open;
 
 public class SettingsView extends DialogFrameLayout implements AdapterView.OnItemClickListener {
     private List<PreferenceAdapter.Data> mSettingsDataList = new ArrayList<>();
@@ -61,6 +64,7 @@ public class SettingsView extends DialogFrameLayout implements AdapterView.OnIte
         mListView.setPadding( defHPadding, 0, 2, 0 );
         mListView.setDivider( new ColorDrawable( Color.TRANSPARENT ) );
         Config config = new Config( context );
+        mSettingsDataList.add( new PreferenceAdapter.Data( "适配状态", msg, "adapter", true, open ) );
         for (int i = 0; i < Setting_list.size(); i++) {
             Constant.Setting setting = (Constant.Setting) Setting_list.get( i );
             mSettingsDataList.add( new PreferenceAdapter.Data( setting.title, setting.subTitle, setting.key, true, config.isOn( setting.key ) ) );
@@ -87,12 +91,20 @@ public class SettingsView extends DialogFrameLayout implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+        PreferenceAdapter.Data data = mListAdapter.getItem( position );
+        if (data.key.equals( "adapter" )) {
+            User.UserMessage_send();
+            data.subTitle=msg;
+            data.selectionState=open;
+            mListAdapter.notifyDataSetChanged();
+            return;
+        }
         final Context context = getContext();
         final Config config = new Config( context );
-        PreferenceAdapter.Data data = mListAdapter.getItem( position );
         data.selectionState = !data.selectionState;
         config.setOn( data.key, data.selectionState );
         mListAdapter.notifyDataSetChanged();
-        
+
+
     }
 }

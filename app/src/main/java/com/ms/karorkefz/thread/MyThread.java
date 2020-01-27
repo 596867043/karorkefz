@@ -19,7 +19,7 @@ public class MyThread {
                 try {
                     if (type == 1) {
                         LogUtil.w( "karorkefz", "MyThread线程:欢迎延迟 " + TimeHook.SimpleDateFormat_Time() );
-                        sleep( 2000 );
+                        sleep( 3000 );
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -34,7 +34,7 @@ public class MyThread {
         new Thread() {
             public void run() {
                 try {
-                    sleep( 2000 );
+                    sleep( 3000 );
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

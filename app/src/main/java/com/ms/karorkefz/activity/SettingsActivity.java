@@ -16,14 +16,13 @@ import android.widget.Toast;
 
 import com.ms.karorkefz.R;
 import com.ms.karorkefz.util.FileUtil;
-import com.ms.karorkefz.util.Update.Adapter;
-import com.ms.karorkefz.util.Update.Update;
+import com.ms.karorkefz.util.NetWork.Adapter;
+import com.ms.karorkefz.util.NetWork.Update;
 
 import org.json.JSONException;
 
 import static com.ms.karorkefz.util.Constant.author;
-import static com.ms.karorkefz.util.Constant.open;
-import static com.ms.karorkefz.util.Update.Gift.Gift_List;
+import static com.ms.karorkefz.util.NetWork.Gift.Gift_List;
 
 /**
  * Created by Jason on 2017/11/24.
@@ -102,12 +101,13 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                                          Preference preference) {
         switch (preference.getKey()) {
             case "gift_update":
-                if (open && author) {
+                if (author) {
                     Toast.makeText( this, "礼物更新中...", Toast.LENGTH_SHORT ).show();
                     Gift_List();
                     return true;
                 } else {
                     Toast.makeText( this, "你估计在逗我....", Toast.LENGTH_SHORT ).show();
+                    return true;
                 }
             case "DeleteLog":
                 DeleteLog();
