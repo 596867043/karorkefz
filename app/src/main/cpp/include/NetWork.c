@@ -25,7 +25,7 @@
 #define LISTENQ 1024
 
 int sockfd;
-char *hname = "149.129.60.44";
+char *hname = "ip地址";
 //char *send_data_path = "/tp5.1/public/karorkefz/gift/get_Gift_main";
 char *result;
 /**
