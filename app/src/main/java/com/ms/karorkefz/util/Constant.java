@@ -7,8 +7,8 @@ import java.util.List;
 
 public class Constant {
     public static final boolean author = true;
-    public static final String url = "http://www.moshou.tech/karorkefz/";
-    public static final String ip = "http://www.moshou.tech/";
+    public static final String url = "ip或者域名";
+    public static final String ip = "ip或者域名";
     public static final String FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/moshou";
     public static final List Setting_list = Setting_ArrayList();
     public static boolean open = false;
